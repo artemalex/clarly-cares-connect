@@ -22,7 +22,7 @@ interface ChatContextType {
   setMode: (mode: MessageMode) => void;
   sendMessage: (content: string) => void;
   startNewChat: () => void;
-  checkSubscriptionStatus: () => Promise<void>; // Added this to fix the type error
+  checkSubscriptionStatus: () => Promise<void>;
 }
 
 const MAX_FREE_MESSAGES = 6;
@@ -82,6 +82,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       
       // Skip checking subscription if user is not logged in
       if (!session.data.session) {
+        console.log("No active session, using free tier limits");
         setMessagesLimit(MAX_FREE_MESSAGES);
         setIsSubscribed(false);
         return;
@@ -95,6 +96,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       
+      console.log("Subscription status:", data);
       setIsSubscribed(data.isSubscribed);
       setMessagesLimit(data.messagesLimit);
       
@@ -202,7 +204,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     setMode,
     sendMessage,
     startNewChat,
-    checkSubscriptionStatus, // Make sure to expose this function
+    checkSubscriptionStatus
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
