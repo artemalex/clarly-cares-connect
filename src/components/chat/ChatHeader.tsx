@@ -12,7 +12,7 @@ const ChatHeader = () => {
 
   return (
     <div className="border-b p-4 bg-card rounded-t-xl">
-      <h2 className="text-lg font-medium mb-2">Chat with Dr. Clarly</h2>
+      <h2 className="text-lg font-medium mb-2">Chat with HelloClarly</h2>
       <div className="flex space-x-2">
         <Button
           size="sm"

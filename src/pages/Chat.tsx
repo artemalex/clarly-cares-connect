@@ -21,7 +21,7 @@ const Chat = () => {
     <div className="container py-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Chat with Dr. Clarly</h1>
+          <h1 className="text-2xl font-bold">Chat with HelloClarly</h1>
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
