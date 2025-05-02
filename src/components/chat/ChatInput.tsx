@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
 import { useChatContext } from "@/contexts/ChatContext";
+import VoiceRecorder from "./VoiceRecorder";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
+  const [activeTab, setActiveTab] = useState<string>("text");
   const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -15,6 +18,11 @@ const ChatInput = () => {
       sendMessage(message);
       setMessage("");
     }
+  };
+
+  const handleVoiceTranscript = (text: string) => {
+    sendMessage(text);
+    setActiveTab("text");
   };
 
   return (
@@ -27,21 +35,38 @@ const ChatInput = () => {
               : "You've reached your message limit"}
           </span>
         </div>
-        <div className="flex space-x-2">
-          <Textarea
-            placeholder="Type your message here..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="resize-none flex-1"
-            disabled={isLoading || remainingMessages <= 0}
-          />
-          <Button 
-            type="submit" 
-            disabled={!message.trim() || isLoading || remainingMessages <= 0}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-2 mb-2">
+            <TabsTrigger value="text">Text</TabsTrigger>
+            <TabsTrigger value="voice">Voice</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="text" className="mt-0">
+            <div className="flex space-x-2">
+              <Textarea
+                placeholder="Type your message here..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="resize-none flex-1"
+                disabled={isLoading || remainingMessages <= 0}
+              />
+              <Button 
+                type="submit" 
+                disabled={!message.trim() || isLoading || remainingMessages <= 0}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="voice" className="mt-0">
+            <VoiceRecorder 
+              onTranscriptSend={handleVoiceTranscript} 
+              disabled={isLoading || remainingMessages <= 0}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </form>
   );
