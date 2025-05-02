@@ -2,6 +2,8 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { v4 as uuidv4 } from 'uuid';
+import { useParams, useNavigate } from "react-router-dom";
 
 export type MessageMode = "slow" | "vent";
 
@@ -19,6 +21,7 @@ interface ChatContextType {
   remainingMessages: number;
   isLoading: boolean;
   isSubscribed: boolean;
+  conversationId: string | null;
   setMode: (mode: MessageMode) => void;
   sendMessage: (content: string) => void;
   startNewChat: () => void;
@@ -44,7 +47,6 @@ export const useChatContext = () => {
   return context;
 };
 
-// Remove the export keyword here, we'll export it at the end of the file
 const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [mode, setMode] = useState<MessageMode>(() => {
@@ -55,6 +57,10 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [messagesLimit, setMessagesLimit] = useState<number>(MAX_FREE_MESSAGES);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  
+  const { id: urlConversationId } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
 
   // Calculate remaining messages
   const remainingMessages = messagesLimit - messagesUsed;
@@ -64,18 +70,20 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("clarlyMode", mode);
   }, [mode]);
 
-  // Check subscription status on mount
+  // Check subscription status and load conversation if ID is provided
   useEffect(() => {
-    checkSubscriptionStatus();
-  }, []);
-
-  // If we have no messages and we're not currently loading, 
-  // start with an initial message from HelloClari
-  useEffect(() => {
-    if (messages.length === 0 && !isLoading) {
-      generateInitialMessage();
-    }
-  }, [messages.length, mode]);
+    const initializeChat = async () => {
+      await checkSubscriptionStatus();
+      
+      if (urlConversationId) {
+        await loadConversation(urlConversationId);
+      } else if (messages.length === 0 && !isLoading) {
+        await startNewChat(true);
+      }
+    };
+    
+    initializeChat();
+  }, [urlConversationId]);
 
   const checkSubscriptionStatus = async () => {
     try {
@@ -101,12 +109,77 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       setIsSubscribed(data.isSubscribed);
       setMessagesLimit(data.messagesLimit);
       
+      // Load user message count
+      const { data: userData, error: userError } = await supabase
+        .from('user_limits')
+        .select('messages_used')
+        .maybeSingle();
+        
+      if (userError) {
+        console.error("Error fetching user limits:", userError);
+        return;
+      }
+      
+      if (userData) {
+        setMessagesUsed(userData.messages_used);
+      }
+      
     } catch (error) {
       console.error("Failed to check subscription status:", error);
     }
   };
 
-  const generateInitialMessage = async () => {
+  const loadConversation = async (id: string) => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch conversation details
+      const { data: conversation, error: convError } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+        
+      if (convError || !conversation) {
+        toast.error("Failed to load conversation or conversation not found");
+        navigate("/chat");
+        return;
+      }
+      
+      // Set the conversation ID and mode
+      setConversationId(id);
+      setMode(conversation.mode as MessageMode);
+      
+      // Fetch messages for the conversation
+      const { data: messageData, error: msgError } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', id)
+        .order('created_at', { ascending: true });
+        
+      if (msgError) {
+        toast.error("Failed to load conversation messages");
+        return;
+      }
+      
+      // Format the messages
+      const formattedMessages: Message[] = messageData.map(msg => ({
+        id: msg.id,
+        role: msg.role as "user" | "assistant" | "system",
+        content: msg.content,
+        timestamp: new Date(msg.created_at)
+      }));
+      
+      setMessages(formattedMessages);
+    } catch (error) {
+      console.error("Error loading conversation:", error);
+      toast.error("Failed to load conversation");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateInitialMessage = async (newConversationId: string) => {
     if (isLoading) return;
     
     setIsLoading(true);
@@ -121,8 +194,19 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       
       if (error) throw error;
       
+      const messageId = uuidv4();
+      
+      // Store message in database
+      await supabase.from('chat_messages').insert({
+        id: messageId,
+        conversation_id: newConversationId,
+        role: 'assistant',
+        content: data.message,
+        user_id: (await supabase.auth.getUser()).data.user?.id
+      });
+      
       const assistantMessage: Message = {
-        id: Date.now().toString(),
+        id: messageId,
         role: "assistant",
         content: data.message,
         timestamp: new Date(),
@@ -147,18 +231,51 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    let activeConversationId = conversationId;
+    if (!activeConversationId) {
+      // Start a new conversation if none exists
+      await startNewChat();
+      activeConversationId = conversationId;
+      
+      // If still no conversation ID, something went wrong
+      if (!activeConversationId) {
+        toast.error("Failed to create conversation");
+        return;
+      }
+    }
+
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) {
+      toast.error("You must be logged in to send messages");
+      return;
+    }
+
+    const messageId = uuidv4();
+    
+    // Create user message object for local state
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: messageId,
       role: "user",
       content,
       timestamp: new Date(),
     };
     
+    // Update local state first for immediate feedback
     setMessages(prevMessages => [...prevMessages, userMessage]);
-    setMessagesUsed(prev => prev + 1);
     setIsLoading(true);
     
     try {
+      // Save user message to database
+      await supabase.from('chat_messages').insert({
+        id: messageId,
+        conversation_id: activeConversationId,
+        role: 'user',
+        content,
+        user_id: userId
+      });
+      
+      // Messages used is incremented via database trigger automatically
+      
       // Prepare messages for the OpenAI API
       const messageHistory = [...messages, userMessage]
         .filter(msg => msg.role !== "system") // Filter out any previous system messages
@@ -174,14 +291,30 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
       
       if (error) throw error;
       
+      const assistantMessageId = uuidv4();
+      
+      // Save AI response to database
+      await supabase.from('chat_messages').insert({
+        id: assistantMessageId,
+        conversation_id: activeConversationId,
+        role: 'assistant',
+        content: data.message,
+        user_id: userId
+      });
+      
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: assistantMessageId,
         role: "assistant",
         content: data.message,
         timestamp: new Date(),
       };
       
+      // Update local state with AI response
       setMessages(prevMessages => [...prevMessages, assistantMessage]);
+      
+      // Reload message usage count after sending
+      await checkSubscriptionStatus();
+      
     } catch (error) {
       toast.error("Failed to get a response. Please try again.");
       console.error("Error generating response:", error);
@@ -190,9 +323,45 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const startNewChat = () => {
-    setMessages([]);
-    // The initial message will be automatically generated via useEffect
+  const startNewChat = async (isInitial = false) => {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      
+      if (!userId) {
+        toast.error("You must be logged in to start a chat");
+        return;
+      }
+      
+      // Create a new conversation in the database
+      const newConversationId = uuidv4();
+      
+      const { error } = await supabase.from('conversations').insert({
+        id: newConversationId,
+        mode,
+        user_id: userId,
+        title: "New Conversation" // Default title, can be updated later
+      });
+      
+      if (error) {
+        toast.error("Failed to create new conversation");
+        return;
+      }
+      
+      // Update local state
+      setConversationId(newConversationId);
+      setMessages([]);
+      
+      // Update URL without reloading
+      navigate(`/chat/${newConversationId}`, { replace: true });
+      
+      // If this isn't the initial call, generate the first message
+      if (!isInitial) {
+        await generateInitialMessage(newConversationId);
+      }
+    } catch (error) {
+      console.error("Error starting new chat:", error);
+      toast.error("Failed to start new chat");
+    }
   };
 
   const value: ChatContextType = {
@@ -202,6 +371,7 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
     remainingMessages,
     isLoading,
     isSubscribed,
+    conversationId,
     setMode,
     sendMessage,
     startNewChat,
@@ -211,5 +381,4 @@ const ChatProvider = ({ children }: { children: ReactNode }) => {
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
 
-// Export the component only once at the end of the file
 export { ChatProvider };

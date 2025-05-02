@@ -37,6 +37,7 @@ const History = () => {
   
   const fetchConversations = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('conversations')
         .select('*')
@@ -44,7 +45,29 @@ const History = () => {
         
       if (error) throw error;
       
-      setConversations(data || []);
+      // Generate titles for conversations without titles
+      const conversationsWithTitles = await Promise.all(
+        (data || []).map(async (conv) => {
+          if (!conv.title || conv.title === "New Conversation") {
+            // Get the first user message to generate a title
+            const { data: messages } = await supabase
+              .from('chat_messages')
+              .select('content')
+              .eq('conversation_id', conv.id)
+              .eq('role', 'user')
+              .order('created_at', { ascending: true })
+              .limit(1);
+              
+            if (messages && messages.length > 0) {
+              const shortTitle = messages[0].content.substring(0, 40) + (messages[0].content.length > 40 ? '...' : '');
+              return { ...conv, title: shortTitle };
+            }
+          }
+          return conv;
+        })
+      );
+      
+      setConversations(conversationsWithTitles);
     } catch (error) {
       console.error("Error fetching conversations:", error);
       toast.error("Failed to load chat history. Please try again later.");

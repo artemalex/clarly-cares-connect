@@ -2,18 +2,62 @@
 import { useChatContext, MessageMode } from "@/contexts/ChatContext";
 import { Button } from "@/components/ui/button";
 import { Clock, Zap, AudioWaveform } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react";
 
 const ChatHeader = () => {
-  const { mode, setMode } = useChatContext();
+  const { mode, setMode, conversationId } = useChatContext();
+  const [title, setTitle] = useState<string | null>("Chat with HelloClari");
   
-  const handleModeChange = (newMode: MessageMode) => {
+  useEffect(() => {
+    // Load conversation title if available
+    if (conversationId) {
+      fetchConversationTitle();
+    }
+  }, [conversationId]);
+  
+  const fetchConversationTitle = async () => {
+    try {
+      if (!conversationId) return;
+      
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('title')
+        .eq('id', conversationId)
+        .maybeSingle();
+      
+      if (error || !data) return;
+      
+      if (data.title) {
+        setTitle(data.title);
+      }
+    } catch (error) {
+      console.error("Error fetching conversation title:", error);
+    }
+  };
+  
+  const handleModeChange = async (newMode: MessageMode) => {
     setMode(newMode);
+    
+    // Update conversation mode in database
+    if (conversationId) {
+      try {
+        await supabase
+          .from('conversations')
+          .update({ mode: newMode })
+          .eq('id', conversationId);
+      } catch (error) {
+        console.error("Error updating conversation mode:", error);
+      }
+    }
   };
   
   return (
     <div className="border-b p-4 bg-card rounded-t-xl">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-medium">Chat with HelloClari</h2>
+        <h2 className="text-lg font-medium truncate">
+          {title || "Chat with HelloClari"}
+        </h2>
         <div className="flex space-x-2">
           <Button 
             size="sm" 

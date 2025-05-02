@@ -1,14 +1,29 @@
 
 import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import ChatContainer from "@/components/chat/ChatContainer";
 import PaywallModal from "@/components/subscription/PaywallModal";
 import { useChatContext } from "@/contexts/ChatContext";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const Chat = () => {
   const { remainingMessages, startNewChat } = useChatContext();
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const { id } = useParams<{ id?: string }>();
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "/login";
+      }
+    };
+    
+    checkAuth();
+  }, []);
 
   // Show paywall when messages are depleted
   useEffect(() => {
