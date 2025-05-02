@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
+import History from "./pages/History";
+import Profile from "./pages/Profile";
 import { ChatProvider } from "./contexts/ChatContext";
 
 const queryClient = new QueryClient();
@@ -26,9 +28,12 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/chat/:id" element={<Chat />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/success" element={<SubscriptionSuccess />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

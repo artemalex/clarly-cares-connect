@@ -1,10 +1,10 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, LogOut } from "lucide-react";
+import { Heart, LogOut, History, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 const Navbar = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center space-x-2 group">
           <Heart className="h-8 w-8 text-clarly-500 group-hover:scale-110 transition-transform" />
           <span className="text-2xl font-display font-semibold bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-transparent">
-            HelloClarly
+            HelloClari
           </span>
         </Link>
         <div className="flex items-center space-x-4">
@@ -76,6 +76,19 @@ const Navbar = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/chat" className="cursor-pointer">My Chats</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/history" className="cursor-pointer flex items-center">
+                    <History className="h-4 w-4 mr-2" />
+                    Chat History
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-500 focus:text-red-500">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out

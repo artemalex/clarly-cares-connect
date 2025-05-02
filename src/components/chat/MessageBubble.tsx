@@ -26,7 +26,7 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
         <p className="whitespace-pre-wrap">{message.content}</p>
       </div>
       <span className="text-xs text-muted-foreground px-2">
-        {isUser ? "You" : "Dr. Clarly"} • {formattedTime}
+        {isUser ? "You" : "Assistant"} • {formattedTime}
       </span>
     </div>
   );
