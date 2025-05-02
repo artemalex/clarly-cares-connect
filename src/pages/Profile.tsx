@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,16 +11,28 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MessageSquare, Clock, CreditCard } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useChatContext } from "@/contexts/ChatContext";
+
+interface Conversation {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  mode: string;
+}
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [usageStats, setUsageStats] = useState({
-    messagesUsed: 0,
-    messagesLimit: 0
-  });
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
+  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
+  const { messagesUsed, remainingMessages, isSubscribed, checkSubscriptionStatus } = useChatContext();
+  
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -40,34 +52,42 @@ const Profile = () => {
   
   const fetchUserProfile = async (user: User) => {
     try {
-      // Fetch user limits
-      const { data: limitsData, error: limitsError } = await supabase
-        .from('user_limits')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-        
-      if (limitsError && limitsError.code !== 'PGRST116') {
-        throw limitsError;
-      }
-      
-      if (limitsData) {
-        setUsageStats({
-          messagesUsed: limitsData.messages_used || 0,
-          messagesLimit: limitsData.messages_limit || 0
-        });
-      }
+      // Refresh subscription status
+      await checkSubscriptionStatus();
       
       // Get user metadata if available
       const metadata = user.user_metadata;
       if (metadata && metadata.name) {
         setDisplayName(metadata.name);
       }
+      
+      // Fetch recent conversations
+      fetchRecentConversations();
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast.error("Failed to load profile data");
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const fetchRecentConversations = async () => {
+    setIsLoadingConversations(true);
+    try {
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(5);
+        
+      if (error) throw error;
+      
+      setConversations(data || []);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      toast.error("Failed to load recent conversations");
+    } finally {
+      setIsLoadingConversations(false);
     }
   };
   
@@ -91,8 +111,46 @@ const Profile = () => {
     }
   };
   
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    
+    setIsCreatingCheckout(true);
+    try {
+      if (isSubscribed) {
+        // Direct user to customer portal to manage their subscription
+        const { data, error } = await supabase.functions.invoke('customer-portal');
+        if (error) throw error;
+        
+        // Redirect to Stripe Customer Portal
+        window.location.href = data.url;
+      } else {
+        // Create checkout session for new subscription
+        const { data, error } = await supabase.functions.invoke('create-checkout');
+        if (error) throw error;
+        
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Error managing subscription:", error);
+      toast.error("Failed to process subscription request");
+    } finally {
+      setIsCreatingCheckout(false);
+    }
+  };
+  
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
+  };
+  
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric'
+    });
   };
   
   if (loading) {
@@ -123,13 +181,15 @@ const Profile = () => {
   
   return (
     <div className="container py-8">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
         
         <Tabs defaultValue="profile">
           <TabsList className="mb-6">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="usage">Usage Stats</TabsTrigger>
+            <TabsTrigger value="history">Chat History</TabsTrigger>
+            <TabsTrigger value="subscription">Subscription</TabsTrigger>
           </TabsList>
           
           <TabsContent value="profile">
@@ -193,37 +253,190 @@ const Profile = () => {
                       <CardTitle className="text-lg">Messages Used</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-4xl font-bold">{usageStats.messagesUsed}</p>
+                      <p className="text-4xl font-bold">{messagesUsed}</p>
                     </CardContent>
                   </Card>
                   
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Messages Limit</CardTitle>
+                      <CardTitle className="text-lg">Messages Remaining</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-4xl font-bold">{usageStats.messagesLimit}</p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {usageStats.messagesUsed >= usageStats.messagesLimit 
-                          ? "You've reached your limit" 
-                          : `${usageStats.messagesLimit - usageStats.messagesUsed} messages remaining`
-                        }
-                      </p>
+                      <p className="text-4xl font-bold">{remainingMessages}</p>
+                      {!isSubscribed && remainingMessages <= 3 && (
+                        <p className="text-sm text-amber-500 mt-2">
+                          You're running low on messages! Consider upgrading.
+                        </p>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
                 
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    Need more messages? Consider upgrading your subscription for unlimited access.
-                  </p>
-                </div>
+                {!isSubscribed && (
+                  <div className="bg-slate-50 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      Need more messages? Consider upgrading your subscription for unlimited access.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="mt-2"
+                      onClick={handleManageSubscription}
+                      disabled={isCreatingCheckout}
+                    >
+                      {isCreatingCheckout ? "Processing..." : "Upgrade Now"}
+                    </Button>
+                  </div>
+                )}
+                
+                <Button 
+                  variant="ghost" 
+                  className="w-full"
+                  onClick={() => checkSubscriptionStatus()}
+                >
+                  Refresh Stats
+                </Button>
               </CardContent>
-              <CardFooter>
-                <Button variant="outline" onClick={() => navigate("/chat")}>
-                  Go to Chat
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="history">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Conversations</CardTitle>
+                <CardDescription>
+                  Your recent chat history with HelloClari
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingConversations ? (
+                  <div className="space-y-4">
+                    {[...Array(3)].map((_, index) => (
+                      <div key={index} className="space-y-2">
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                      </div>
+                    ))}
+                  </div>
+                ) : conversations.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Conversation</TableHead>
+                        <TableHead>Mode</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {conversations.map((conversation) => (
+                        <TableRow key={conversation.id}>
+                          <TableCell className="font-medium">
+                            {conversation.title || "Untitled Conversation"}
+                          </TableCell>
+                          <TableCell className="capitalize">
+                            {conversation.mode}
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(conversation.updated_at)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              asChild
+                            >
+                              <Link to={`/chat/${conversation.id}`}>
+                                Continue
+                              </Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8">
+                    <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Start a new chat with HelloClari
+                    </p>
+                    <Button asChild>
+                      <Link to="/chat">Start Chatting</Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button variant="outline" onClick={fetchRecentConversations}>
+                  Refresh
+                </Button>
+                <Button asChild>
+                  <Link to="/history">View All History</Link>
                 </Button>
               </CardFooter>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="subscription">
+            <Card>
+              <CardHeader>
+                <CardTitle>Subscription Management</CardTitle>
+                <CardDescription>
+                  Manage your HelloClari subscription
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-slate-50 p-6 rounded-lg text-center">
+                  <div className="mb-6">
+                    <span className="inline-block bg-white p-3 rounded-full shadow mb-4">
+                      <CreditCard className="h-8 w-8 text-clarly-500" />
+                    </span>
+                    <h3 className="text-xl font-bold mb-2">
+                      {isSubscribed ? "HelloClari Premium" : "Free Plan"}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {isSubscribed 
+                        ? "You have access to all premium features" 
+                        : "Upgrade to get unlimited messages and premium features"}
+                    </p>
+                  </div>
+                  
+                  {isSubscribed ? (
+                    <div className="space-y-4">
+                      <div className="px-4 py-3 bg-green-50 text-green-700 rounded-md text-sm">
+                        Your subscription is active
+                      </div>
+                      <Button 
+                        onClick={handleManageSubscription} 
+                        disabled={isCreatingCheckout}
+                      >
+                        {isCreatingCheckout ? "Processing..." : "Manage Subscription"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid gap-4">
+                        <div className="flex items-center justify-between p-4 border rounded-md">
+                          <div className="font-medium">Free Plan</div>
+                          <div>6 messages / month</div>
+                        </div>
+                        <div className="flex items-center justify-between p-4 border border-clarly-200 bg-clarly-50 rounded-md">
+                          <div className="font-medium">Premium</div>
+                          <div>3,000 messages / month</div>
+                        </div>
+                      </div>
+                      <Button 
+                        onClick={handleManageSubscription} 
+                        disabled={isCreatingCheckout}
+                        className="w-full"
+                      >
+                        {isCreatingCheckout ? "Processing..." : "Upgrade to Premium - $9.99/month"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
