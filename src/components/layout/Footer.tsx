@@ -8,7 +8,7 @@ const Footer = () => {
             <span className="font-display font-semibold text-clarly-700">HelloClari</span>
           </div>
           <div className="text-sm text-muted-foreground">
-            <p>© 2025 Dr. Clarly. All rights reserved.</p>
+            <p>© 2025 HelloClari. All rights reserved.</p>
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
