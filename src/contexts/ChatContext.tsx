@@ -22,6 +22,7 @@ interface ChatContextType {
   setMode: (mode: MessageMode) => void;
   sendMessage: (content: string) => void;
   startNewChat: () => void;
+  checkSubscriptionStatus: () => Promise<void>; // Added this to fix the type error
 }
 
 const MAX_FREE_MESSAGES = 6;
@@ -201,6 +202,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     setMode,
     sendMessage,
     startNewChat,
+    checkSubscriptionStatus, // Make sure to expose this function
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
