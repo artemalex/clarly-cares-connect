@@ -13,13 +13,24 @@ interface PaywallModalProps {
 }
 
 const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
-  const { remainingMessages } = useChatContext();
+  const { remainingMessages, isSubscribed } = useChatContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscribe = async () => {
     setIsLoading(true);
     
     try {
+      // Check if user is logged in
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (!sessionData.session) {
+        // Redirect to login if not logged in
+        toast.info("Please sign in to subscribe.");
+        window.location.href = "/login?redirect=subscribe";
+        return;
+      }
+      
+      // Call the checkout function
       const { data, error } = await supabase.functions.invoke('create-checkout', {});
       
       if (error) {
@@ -39,6 +50,25 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
       setIsLoading(false);
     }
   };
+
+  // If user is subscribed but somehow still seeing the paywall, provide helpful message
+  if (isSubscribed && remainingMessages <= 0) {
+    return (
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-display text-center">Message Limit Reached</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              You've used all your premium messages for this month.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center pt-4">
+            <Button onClick={onClose}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

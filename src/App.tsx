@@ -10,6 +10,7 @@ import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import { ChatProvider } from "./contexts/ChatContext";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/chat" element={<Chat />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/success" element={<SubscriptionSuccess />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

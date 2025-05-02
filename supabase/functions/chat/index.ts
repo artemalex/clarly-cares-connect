@@ -51,7 +51,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${openaiApiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: "gpt-4o", // Updated to use gpt-4o
         messages: openaiMessages,
         max_tokens: 1000,
         temperature: 0.7

@@ -7,7 +7,7 @@ import { useChatContext } from "@/contexts/ChatContext";
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
-  const { sendMessage, isLoading, remainingMessages } = useChatContext();
+  const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +23,8 @@ const ChatInput = () => {
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm text-muted-foreground">
             {remainingMessages > 0 
-              ? `${remainingMessages} free messages remaining` 
-              : "You've reached your free message limit"}
+              ? `${remainingMessages} ${isSubscribed ? 'premium' : 'free'} messages remaining` 
+              : "You've reached your message limit"}
           </span>
         </div>
         <div className="flex space-x-2">

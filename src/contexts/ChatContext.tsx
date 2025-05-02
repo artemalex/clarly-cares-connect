@@ -18,12 +18,14 @@ interface ChatContextType {
   messagesUsed: number;
   remainingMessages: number;
   isLoading: boolean;
+  isSubscribed: boolean;
   setMode: (mode: MessageMode) => void;
   sendMessage: (content: string) => void;
   startNewChat: () => void;
 }
 
 const MAX_FREE_MESSAGES = 6;
+const MAX_PREMIUM_MESSAGES = 3000;
 
 // System prompts for each mode
 const SYSTEM_PROMPTS = {
@@ -43,19 +45,62 @@ export const useChatContext = () => {
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [mode, setMode] = useState<MessageMode>("slow");
+  const [mode, setMode] = useState<MessageMode>(() => {
+    const savedMode = localStorage.getItem("clarlyMode");
+    return (savedMode === "slow" || savedMode === "vent") ? savedMode : "slow";
+  });
   const [messagesUsed, setMessagesUsed] = useState<number>(0);
+  const [messagesLimit, setMessagesLimit] = useState<number>(MAX_FREE_MESSAGES);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
-  const remainingMessages = MAX_FREE_MESSAGES - messagesUsed;
+  // Calculate remaining messages
+  const remainingMessages = messagesLimit - messagesUsed;
 
+  // Save mode to localStorage whenever it changes
   useEffect(() => {
-    // If we have no messages and we're not currently loading, 
-    // start with an initial message from Dr. Clarly
+    localStorage.setItem("clarlyMode", mode);
+  }, [mode]);
+
+  // Check subscription status on mount
+  useEffect(() => {
+    checkSubscriptionStatus();
+  }, []);
+
+  // If we have no messages and we're not currently loading, 
+  // start with an initial message from Dr. Clarly
+  useEffect(() => {
     if (messages.length === 0 && !isLoading) {
       generateInitialMessage();
     }
   }, [messages.length, mode]);
+
+  const checkSubscriptionStatus = async () => {
+    try {
+      const session = await supabase.auth.getSession();
+      
+      // Skip checking subscription if user is not logged in
+      if (!session.data.session) {
+        setMessagesLimit(MAX_FREE_MESSAGES);
+        setIsSubscribed(false);
+        return;
+      }
+      
+      // Call the subscription check function
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      
+      if (error) {
+        console.error("Error checking subscription:", error);
+        return;
+      }
+      
+      setIsSubscribed(data.isSubscribed);
+      setMessagesLimit(data.messagesLimit);
+      
+    } catch (error) {
+      console.error("Failed to check subscription status:", error);
+    }
+  };
 
   const generateInitialMessage = async () => {
     if (isLoading) return;
@@ -91,8 +136,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const sendMessage = async (content: string) => {
     if (content.trim() === "") return;
     
-    if (messagesUsed >= MAX_FREE_MESSAGES) {
-      toast.error("You've reached your message limit. Please subscribe to continue.");
+    if (messagesUsed >= messagesLimit) {
+      toast.error(isSubscribed 
+        ? "You've reached your monthly message limit." 
+        : "You've reached your free message limit. Please subscribe to continue.");
       return;
     }
 
@@ -150,6 +197,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     messagesUsed,
     remainingMessages,
     isLoading,
+    isSubscribed,
     setMode,
     sendMessage,
     startNewChat,
