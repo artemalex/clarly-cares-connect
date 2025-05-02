@@ -1,8 +1,7 @@
-
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
-import { useChatContext } from "@/contexts/ChatContext";
+import { useChatContext } from "@/contexts/chat";
 
 const ChatContainer = () => {
   const { isLoading } = useChatContext();

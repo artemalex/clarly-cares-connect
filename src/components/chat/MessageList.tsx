@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { useChatContext } from "@/contexts/ChatContext";
+import { useChatContext } from "@/contexts/chat";
 import MessageBubble from "./MessageBubble";
 import { Loader2 } from "lucide-react";
 

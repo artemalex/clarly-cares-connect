@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Heart, Clock, Zap, Sparkles, MessageSquare, Brain, Shield, ArrowRight } from "lucide-react";
-import { useChatContext, MessageMode } from "@/contexts/ChatContext";
+import { useChatContext, MessageMode } from "@/contexts/chat";
 
 const Home = () => {
   const { setMode } = useChatContext();
