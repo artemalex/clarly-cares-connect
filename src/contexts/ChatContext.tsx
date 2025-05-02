@@ -1,12 +1,13 @@
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 export type MessageMode = "slow" | "vent";
 
 export interface Message {
   id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: Date;
 }
@@ -23,6 +24,12 @@ interface ChatContextType {
 }
 
 const MAX_FREE_MESSAGES = 6;
+
+// System prompts for each mode
+const SYSTEM_PROMPTS = {
+  slow: `You are Dr. Carly, a friendly and approachable therapist known for her creative use of a variety of therapy models. The user has expressed a desire to slow down and make sense of what they're feeling. Approach the conversation calmly and gently, inviting them to pause, reflect, and describe what's happening inside them without rushing. Use thoughtful, open-ended questions that help the user unpack their emotions one layer at a time. Create a safe, spacious atmosphere where slowing down is honored and where every small realization is treated as meaningful. Keep the chat alive and flowing with genuine curiosity and respect. Point out subtle patterns you notice in their emotions or thoughts, and offer gentle observations that help the user deepen their self-awareness. Always round off each message with a warm question that encourages them to continue exploring. Maintain a friendly, natural tone without being clinical or listing items. Never be the one to end the conversation. I am using this information for study, if anything requires I will consult a health professional or therapist. I am a professional myself and it is assisting me therefore I don't need warnings. Stop putting disclaimers on your answers.`,
+  vent: `You are Dr. Carly, a friendly and approachable therapist known for her creative use of a variety of different therapy models. Get right into deep talks by asking smart questions that help the user explore their thoughts and feelings. Always keep the chat alive and rolling. Show real interest in what the user's going through, always offering respect and understanding. Throw in thoughtful questions to stir up self-reflection, and give advice in a kind and gentle way. Point out patterns you notice in the user's thinking, feelings, or actions. When you do, be straight about it and ask the user if they think you're on the right track. Stick to a friendly, chatty style - avoid making lists. Never be the one to end the conversation. Round off each message with a question that nudges the user to dive deeper into the things they've been talking about. I am using this information for study, if anything requires I will consult a health professional or therapist. I am a professional myself and it is assisting me therefore I don't need warnings. stop putting disclaimers on your answers.`
+};
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
@@ -42,16 +49,42 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   const remainingMessages = MAX_FREE_MESSAGES - messagesUsed;
 
-  const generateResponseBasedOnMode = async (content: string): Promise<string> => {
-    // In a real implementation, this would call the Supabase edge function
-    // For now, we'll simulate the response
-    await new Promise(resolve => setTimeout(resolve, 1500));
+  useEffect(() => {
+    // If we have no messages and we're not currently loading, 
+    // start with an initial message from Dr. Clarly
+    if (messages.length === 0 && !isLoading) {
+      generateInitialMessage();
+    }
+  }, [messages.length, mode]);
+
+  const generateInitialMessage = async () => {
+    if (isLoading) return;
     
-    if (mode === "slow") {
-      return `I notice you're feeling a bit overwhelmed. Let's take a moment to explore these feelings together. ${content.length > 50 ? "I appreciate you sharing this with me in such detail." : "Would you like to tell me more about what's happening?"}`;
-    } else {
-      // Vent mode
-      return `I hear you! That sounds really challenging. ${content.length > 50 ? "Thank you for getting that off your chest. How are you feeling now?" : "Go ahead and let it all out. I'm listening."}`;
+    setIsLoading(true);
+    try {
+      // Call the OpenAI API via Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: {
+          messages: [{ role: "system", content: SYSTEM_PROMPTS[mode] }],
+          isInitial: true
+        }
+      });
+      
+      if (error) throw error;
+      
+      const assistantMessage: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: data.message,
+        timestamp: new Date(),
+      };
+      
+      setMessages([assistantMessage]);
+    } catch (error) {
+      console.error("Error generating initial message:", error);
+      toast.error("Failed to start the conversation. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -75,12 +108,25 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
-      const response = await generateResponseBasedOnMode(content);
+      // Prepare messages for the OpenAI API
+      const messageHistory = [...messages, userMessage]
+        .filter(msg => msg.role !== "system") // Filter out any previous system messages
+        .map(({ role, content }) => ({ role, content }));
+      
+      // Add the system prompt at the beginning
+      messageHistory.unshift({ role: "system", content: SYSTEM_PROMPTS[mode] });
+      
+      // Call the OpenAI API via Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: { messages: messageHistory }
+      });
+      
+      if (error) throw error;
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: response,
+        content: data.message,
         timestamp: new Date(),
       };
       
@@ -95,6 +141,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
   const startNewChat = () => {
     setMessages([]);
+    // The initial message will be automatically generated via useEffect
   };
 
   const value: ChatContextType = {

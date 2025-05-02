@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { useChatContext } from "@/contexts/ChatContext";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 interface PaywallModalProps {
   open: boolean;
@@ -16,11 +18,26 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
 
   const handleSubscribe = async () => {
     setIsLoading(true);
-    // This would connect to Stripe in a real implementation
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // For now, just close the modal
-    onClose();
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {});
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error("Failed to create checkout session");
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast.error("Failed to start subscription process. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
