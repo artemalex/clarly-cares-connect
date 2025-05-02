@@ -6,6 +6,7 @@ import { useChatContext } from "@/contexts/ChatContext";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface PaywallModalProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface PaywallModalProps {
 const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
   const { remainingMessages, isSubscribed } = useChatContext();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubscribe = async () => {
     setIsLoading(true);
@@ -26,7 +28,8 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
       if (!sessionData.session) {
         // Redirect to login if not logged in
         toast.info("Please sign in to subscribe.");
-        window.location.href = "/login?redirect=subscribe";
+        navigate("/login?redirect=subscribe");
+        onClose();
         return;
       }
       
@@ -80,7 +83,7 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
           <DialogDescription className="text-center pt-2">
             {remainingMessages <= 0 
               ? "You've used all your free messages for today." 
-              : "Get unlimited access to Dr. Clarly"}
+              : "Get unlimited access to HelloClarly"}
           </DialogDescription>
         </DialogHeader>
         
