@@ -17,7 +17,7 @@ const MessageList = () => {
       {messages.length === 0 ? (
         <div className="flex items-center justify-center h-full">
           <p className="text-muted-foreground text-center">
-            Send a message to start chatting with Dr. Clarly
+            Send a message to start chatting with Assistant
           </p>
         </div>
       ) : (
@@ -29,7 +29,7 @@ const MessageList = () => {
             <div className="flex items-center space-x-2 animate-fade-in">
               <div className="message-bubble assistant-message rounded-tl-none flex items-center space-x-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Dr. Clarly is typing...</span>
+                <span>Assistant is typing...</span>
               </div>
             </div>
           )}

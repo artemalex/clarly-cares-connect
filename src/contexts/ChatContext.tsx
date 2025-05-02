@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -43,7 +44,8 @@ export const useChatContext = () => {
   return context;
 };
 
-export const ChatProvider = ({ children }: { children: ReactNode }) => {
+// Remove the export keyword here, we'll export it at the end of the file
+const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [mode, setMode] = useState<MessageMode>(() => {
     const savedMode = localStorage.getItem("clarlyMode");
@@ -209,4 +211,5 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
 
+// Export the component only once at the end of the file
 export { ChatProvider };
