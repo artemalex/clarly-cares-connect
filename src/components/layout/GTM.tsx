@@ -6,8 +6,8 @@ interface GTMProps {
 }
 
 const GTM = ({ id = "GTM-PSB76CLL" }: GTMProps) => {
-  // Don't render anything if GTM ID is not provided or is the placeholder
-  if (!id || id === "GTM-PSB76CLL") return null;
+  // Only check if ID is empty, don't block the default GTM ID
+  if (!id) return null;
 
   return (
     <>

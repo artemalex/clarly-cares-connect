@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-// Check if we have the GTM script in the head
+// Check if we have the GTM script in the head and inject it properly
 const injectGTMScript = () => {
   const gtmScript = document.getElementById('gtm-script');
   if (gtmScript) {
