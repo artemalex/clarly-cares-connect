@@ -11,7 +11,7 @@ const CTASection = ({
 }: CTASectionProps) => {
   return <section className="py-16 container">
       <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+        <h2 className="text-3xl font-bold mb-4">Ready to Feel Lighter?</h2>
         <p className="text-xl text-muted-foreground mb-8">Start your first chat with HelloClari now and see how fast work stress eases.</p>
         <Button size="lg" className="px-8 py-6 text-lg" asChild>
           <Link to="/chat" onClick={() => handleStartChat(selectedMode)}>
