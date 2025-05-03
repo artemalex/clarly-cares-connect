@@ -8,9 +8,13 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 const Navbar = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({
@@ -31,15 +35,19 @@ const Navbar = () => {
     });
     return () => subscription.unsubscribe();
   }, []);
+  
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast.success("Signed out successfully");
     navigate("/");
   };
+  
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
   };
-  return <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+  
+  return (
+    <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="container flex items-center justify-between py-4">
         <Link to="/" className="flex items-center space-x-2 group">
           <Heart className="h-8 w-8 text-clarly-500 group-hover:scale-110 transition-transform" />
@@ -47,12 +55,18 @@ const Navbar = () => {
             HelloClari
           </span>
         </Link>
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" asChild>
-            <Link to="/history" className="">Chat History</Link>
-          </Button>
+        <div className="flex items-center space-x-2 md:space-x-4">
+          {/* Only show Chat History for logged in users */}
+          {user && (
+            <Button variant="ghost" asChild className={isMobile ? "px-2" : ""}>
+              <Link to="/history">
+                {isMobile ? <History className="h-4 w-4" /> : "Chat History"}
+              </Link>
+            </Button>
+          )}
           
-          {user ? <DropdownMenu>
+          {user ? (
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="rounded-full w-10 h-10 p-0">
                   <Avatar>
@@ -88,16 +102,21 @@ const Navbar = () => {
                   Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu> : <>
-              <Button variant="outline" asChild>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button variant="outline" asChild className={isMobile ? "px-3 py-1 h-auto text-sm" : ""}>
                 <Link to="/login">Log In</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className={isMobile ? "px-3 py-1 h-auto text-sm" : ""}>
                 <Link to="/signup">Sign Up</Link>
               </Button>
-            </>}
+            </>
+          )}
         </div>
       </div>
-    </nav>;
+    </nav>
+  );
 };
+
 export default Navbar;

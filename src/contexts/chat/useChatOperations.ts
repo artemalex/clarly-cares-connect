@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from "@/lib/supabase";
@@ -111,6 +112,14 @@ export function useChatOperations() {
     try {
       setIsLoading(true);
       
+      // Check if user is logged in
+      const session = await supabase.auth.getSession();
+      if (!session.data.session) {
+        toast.error("You must be logged in to view conversations");
+        navigate("/login");
+        return;
+      }
+      
       // Fetch conversation details
       const { data: conversation, error: convError } = await supabase
         .from('conversations')
@@ -145,7 +154,8 @@ export function useChatOperations() {
         id: msg.id,
         role: msg.role as "user" | "assistant" | "system",
         content: msg.content,
-        timestamp: new Date(msg.created_at)
+        timestamp: new Date(msg.created_at),
+        suggestions: msg.suggestions ? JSON.parse(msg.suggestions) : undefined
       }));
       
       setMessages(formattedMessages);
@@ -173,21 +183,27 @@ export function useChatOperations() {
       if (error) throw error;
       
       const messageId = uuidv4();
+      const suggestions = data.suggestions || [];
       
-      // Store message in database
-      await supabase.from('chat_messages').insert({
-        id: messageId,
-        conversation_id: newConversationId,
-        role: 'assistant',
-        content: data.message,
-        user_id: (await supabase.auth.getUser()).data.user?.id
-      });
+      // For logged in users, store message in database
+      const session = await supabase.auth.getSession();
+      if (session.data.session?.user) {
+        await supabase.from('chat_messages').insert({
+          id: messageId,
+          conversation_id: newConversationId,
+          role: 'assistant',
+          content: data.message,
+          suggestions: JSON.stringify(suggestions),
+          user_id: session.data.session.user.id
+        });
+      }
       
       const assistantMessage: Message = {
         id: messageId,
         role: "assistant",
         content: data.message,
         timestamp: new Date(),
+        suggestions: suggestions
       };
       
       setMessages([assistantMessage]);
@@ -211,7 +227,7 @@ export function useChatOperations() {
 
     let activeConversationId = conversationId;
     if (!activeConversationId) {
-      // Start a new conversation if none exists
+      // Start a new conversation
       await startNewChat();
       activeConversationId = conversationId;
       
@@ -220,12 +236,6 @@ export function useChatOperations() {
         toast.error("Failed to create conversation");
         return;
       }
-    }
-
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (!userId) {
-      toast.error("You must be logged in to send messages");
-      return;
     }
 
     const messageId = uuidv4();
@@ -243,16 +253,23 @@ export function useChatOperations() {
     setIsLoading(true);
     
     try {
-      // Save user message to database
-      await supabase.from('chat_messages').insert({
-        id: messageId,
-        conversation_id: activeConversationId,
-        role: 'user',
-        content,
-        user_id: userId
-      });
+      // Check if user is logged in
+      const session = await supabase.auth.getSession();
+      const userId = session.data.session?.user?.id;
       
-      // Messages used is incremented via database trigger automatically
+      // Save user message to database if logged in
+      if (userId) {
+        await supabase.from('chat_messages').insert({
+          id: messageId,
+          conversation_id: activeConversationId,
+          role: 'user',
+          content,
+          user_id: userId
+        });
+      } else {
+        // Increment message count for guest users
+        setMessagesUsed(prev => prev + 1);
+      }
       
       // Prepare messages for the OpenAI API
       const messageHistory = [...messages, userMessage]
@@ -270,28 +287,38 @@ export function useChatOperations() {
       if (error) throw error;
       
       const assistantMessageId = uuidv4();
+      const suggestions = data.suggestions || [];
       
-      // Save AI response to database
-      await supabase.from('chat_messages').insert({
-        id: assistantMessageId,
-        conversation_id: activeConversationId,
-        role: 'assistant',
-        content: data.message,
-        user_id: userId
-      });
+      // Save AI response to database if logged in
+      if (userId) {
+        await supabase.from('chat_messages').insert({
+          id: assistantMessageId,
+          conversation_id: activeConversationId,
+          role: 'assistant',
+          content: data.message,
+          suggestions: JSON.stringify(suggestions),
+          user_id: userId
+        });
+      } else {
+        // Increment message count for guest users
+        setMessagesUsed(prev => prev + 1);
+      }
       
       const assistantMessage: Message = {
         id: assistantMessageId,
         role: "assistant",
         content: data.message,
         timestamp: new Date(),
+        suggestions: suggestions
       };
       
       // Update local state with AI response
       setMessages(prevMessages => [...prevMessages, assistantMessage]);
       
-      // Reload message usage count after sending
-      await checkSubscriptionStatus();
+      // Reload message usage count after sending if user is logged in
+      if (userId) {
+        await checkSubscriptionStatus();
+      }
       
     } catch (error) {
       toast.error("Failed to get a response. Please try again.");
@@ -303,34 +330,31 @@ export function useChatOperations() {
 
   const startNewChat = async (isInitial = false) => {
     try {
-      const userId = (await supabase.auth.getUser()).data.user?.id;
+      const session = await supabase.auth.getSession();
+      const userId = session.data.session?.user?.id;
       
-      if (!userId) {
-        toast.error("You must be logged in to start a chat");
-        return;
-      }
-      
-      // Create a new conversation in the database
+      // Create a new conversation ID regardless of login status
       const newConversationId = uuidv4();
-      
-      const { error } = await supabase.from('conversations').insert({
-        id: newConversationId,
-        mode,
-        user_id: userId,
-        title: "New Conversation" // Default title, can be updated later
-      });
-      
-      if (error) {
-        toast.error("Failed to create new conversation");
-        return;
-      }
-      
-      // Update local state
       setConversationId(newConversationId);
       setMessages([]);
       
-      // Update URL without reloading - Fixed here to match the navigate signature
-      navigate(`/chat/${newConversationId}`, { replace: true });
+      // If user is logged in, save conversation to database
+      if (userId) {
+        const { error } = await supabase.from('conversations').insert({
+          id: newConversationId,
+          mode,
+          user_id: userId,
+          title: "New Conversation" // Default title, can be updated later
+        });
+        
+        if (error) {
+          toast.error("Failed to create new conversation");
+          return;
+        }
+        
+        // Update URL for logged in users
+        navigate(`/chat/${newConversationId}`, { replace: true });
+      }
       
       // If this isn't the initial call, generate the first message
       if (!isInitial) {

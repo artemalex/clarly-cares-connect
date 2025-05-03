@@ -29,11 +29,13 @@ const ChatInput = () => {
     <form onSubmit={handleSubmit} className="p-4 border-t bg-card rounded-b-xl">
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center mb-2">
+          {/* Only show remaining messages for non-subscribed users with messages left */}
           {!isSubscribed && remainingMessages > 0 && (
             <span className="text-sm text-muted-foreground">
               {remainingMessages} free messages remaining
             </span>
           )}
+          {/* Always show message limit warning when reached */}
           {remainingMessages <= 0 && (
             <span className="text-sm text-muted-foreground">
               You've reached your message limit

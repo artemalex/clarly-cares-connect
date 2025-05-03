@@ -8,6 +8,27 @@ interface Message {
   content: string;
 }
 
+// Define function schema for OpenAI to generate suggestions
+const functions = [
+  {
+    name: "generate_suggestions",
+    description: "Generate 2-3 dynamic follow-up prompts based on the user's emotional context",
+    parameters: {
+      type: "object",
+      properties: {
+        suggestions: {
+          type: "array",
+          items: {
+            type: "string"
+          },
+          description: "Follow-up messages the user might click to continue the conversation"
+        }
+      },
+      required: ["suggestions"]
+    }
+  }
+];
+
 serve(async (req) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
@@ -54,7 +75,9 @@ serve(async (req) => {
         model: "gpt-4o", 
         messages: openaiMessages,
         max_tokens: 1000,
-        temperature: 0.7
+        temperature: 0.7,
+        functions: functions,
+        function_call: { name: "generate_suggestions" }
       })
     });
 
@@ -65,9 +88,21 @@ serve(async (req) => {
     }
 
     const message = data.choices[0].message.content;
+    let suggestions = [];
+    
+    // Parse suggestions from function call
+    const functionCall = data.choices[0].message.function_call;
+    if (functionCall && functionCall.name === "generate_suggestions") {
+      try {
+        const args = JSON.parse(functionCall.arguments);
+        suggestions = args.suggestions || [];
+      } catch (e) {
+        console.error("Error parsing suggestions:", e);
+      }
+    }
 
     return new Response(
-      JSON.stringify({ message }),
+      JSON.stringify({ message, suggestions }),
       {
         headers: {
           ...corsHeaders,
