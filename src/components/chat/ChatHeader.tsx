@@ -44,10 +44,6 @@ const ChatHeader = () => {
           {title || "Chat with HelloClari"}
         </h2>
       </div>
-      <p className="text-sm text-muted-foreground mt-2">
-        <AudioWaveform className="h-4 w-4 inline-block mr-1" />
-        You can now use voice input! Switch to the voice tab below to record messages.
-      </p>
     </div>
   );
 };
