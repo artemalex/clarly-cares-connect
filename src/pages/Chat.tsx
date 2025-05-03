@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import ChatContainer from "@/components/chat/ChatContainer";
+import ChatModeSelector from "@/components/chat/ChatModeSelector";
 import PaywallModal from "@/components/subscription/PaywallModal";
 import { useChatContext } from "@/contexts/chat";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,9 @@ import { Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Chat = () => {
-  const { remainingMessages, startNewChat, messages } = useChatContext();
+  const { remainingMessages, startNewChat, messages, setMode } = useChatContext();
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
   const { id } = useParams<{ id?: string }>();
   const isMobile = useIsMobile();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -50,6 +52,16 @@ const Chat = () => {
       });
     }
   }, [messages, isMobile]);
+
+  const handleNewChat = () => {
+    setModeSelectorOpen(true);
+  };
+
+  const handleSelectMode = (mode: typeof import('@/contexts/chat').MessageMode) => {
+    setMode(mode);
+    setModeSelectorOpen(false);
+    startNewChat();
+  };
   
   return (
     <div 
@@ -63,7 +75,7 @@ const Chat = () => {
             <Button 
               variant="outline" 
               size={isMobile ? "sm" : "default"}
-              onClick={startNewChat}
+              onClick={handleNewChat}
               className="flex items-center whitespace-nowrap"
             >
               <Plus className="h-4 w-4 mr-1" />
@@ -79,6 +91,12 @@ const Chat = () => {
         <PaywallModal 
           open={paywallOpen} 
           onClose={() => setPaywallOpen(false)} 
+        />
+        
+        <ChatModeSelector
+          isOpen={modeSelectorOpen}
+          onClose={() => setModeSelectorOpen(false)}
+          onSelectMode={handleSelectMode}
         />
       </div>
     </div>
