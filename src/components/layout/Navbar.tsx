@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, LogOut, History, User } from "lucide-react";
+import { LogOut, History, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User as SupabaseUser } from "@supabase/supabase-js";
@@ -8,10 +8,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 const Navbar = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({
@@ -32,18 +34,20 @@ const Navbar = () => {
     });
     return () => subscription.unsubscribe();
   }, []);
+  
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast.success("Signed out successfully");
     navigate("/");
   };
+  
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
   };
+  
   return <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="container flex items-center justify-between py-[14px] px-0">
         <Link to="/" className="flex items-center space-x-2 group">
-          <Heart className="h-8 w-8 text-clarly-500 group-hover:scale-110 transition-transform" />
           <span className="font-display font-semibold bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-2xl text-empath-950">
             HelloClari
           </span>
@@ -104,4 +108,5 @@ const Navbar = () => {
       </div>
     </nav>;
 };
+
 export default Navbar;

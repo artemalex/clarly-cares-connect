@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Heart } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { MessageMode } from "@/contexts/chat";
 
 interface HeroSectionProps {
@@ -15,9 +15,6 @@ const HeroSection = ({ selectedMode, handleStartChat }: HeroSectionProps) => {
       <div className="container">
         <div className="max-w-4xl mx-auto text-center">
           <div className="animate-fade-up">
-            <div className="flex justify-center mb-6">
-              <Heart className="h-16 w-16 text-clarly-500" />
-            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-empath-950">
               When work drains you emotionally, talk to Clari.
             </h1>
