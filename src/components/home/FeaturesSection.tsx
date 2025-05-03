@@ -6,12 +6,12 @@ const features = [
   {
     icon: <MessageSquare className="h-8 w-8 text-clarly-500" />,
     title: "Instant Presence",
-    description: "Open the chat, type a word, and Clari answers in under two seconds—no office hours, no waiting room."
+    description: "Open the chat, type a word, and HelloClari answers in under two seconds—no office hours, no waiting room."
   },
   {
     icon: <Heart className="h-8 w-8 text-clarly-500" />,
     title: "Judgment-Free Listening",
-    description: "Clari never lectures, diagnoses, or reports—she simply stays until the weight feels lighter."
+    description: "HelloClari never lectures, diagnoses, or reports—she simply stays until the weight feels lighter."
   },
   {
     icon: <Brain className="h-8 w-8 text-clarly-500" />,
@@ -21,12 +21,12 @@ const features = [
   {
     icon: <Shield className="h-8 w-8 text-clarly-500" />,
     title: "Private & Secure",
-    description: "Your conversations stay between you and Clari. We only ask for your email to keep your account safe, and we never sell or share your data—ever."
+    description: "Your conversations stay between you and HelloClari. We only ask for your email to keep your account safe, and we never sell or share your data—ever."
   },
   {
     icon: <Sparkles className="h-8 w-8 text-clarly-500" />,
     title: "Learns *You*, Never Shares",
-    description: "Clari adapts to your tone and patterns (not your identity) to mirror you better with every session."
+    description: "HelloClari adapts to your tone and patterns (not your identity) to mirror you better with every session."
   },
   {
     icon: <Zap className="h-8 w-8 text-clarly-500" />,
@@ -39,7 +39,7 @@ const FeaturesSection = () => {
   return (
     <section className="py-16 bg-gradient-to-b from-white to-muted/30 rounded-xl">
       <div className="container">
-        <h2 className="text-3xl font-bold text-center mb-4">How Clari Lightens the Load</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">How HelloClari Lightens the Load</h2>
         <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
           Six ways our always‑on AI confidant turns work‑day overwhelm into calm clarity.
         </p>
