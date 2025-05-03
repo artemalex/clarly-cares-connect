@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 const PricingSection = () => {
   return <section className="py-16 bg-gradient-to-b from-white to-muted/30">
       <div className="container">
-        <h2 className="text-3xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">One Flat Price, Unlimited Support</h2>
         <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
           Less than the cost of lunch for your emotional well-being
         </p>
