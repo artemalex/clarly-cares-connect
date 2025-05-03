@@ -4,17 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Heart, Clock, Zap, Sparkles, MessageSquare, Brain, Shield, ArrowRight } from "lucide-react";
 import { useChatContext, MessageMode } from "@/contexts/chat";
-
 const Home = () => {
-  const { setMode } = useChatContext();
+  const {
+    setMode
+  } = useChatContext();
   const [selectedMode, setSelectedMode] = useState<MessageMode>("slow");
-
   const handleStartChat = (mode: MessageMode) => {
     setMode(mode);
   };
-
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-clarly-50/50 to-support-50/50 py-16 md:py-24">
         <div className="container">
@@ -23,7 +21,7 @@ const Home = () => {
               <div className="flex justify-center mb-6">
                 <Heart className="h-16 w-16 text-clarly-500" />
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-empath-950">
                 Your Emotional Support Companion
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -54,12 +52,7 @@ const Home = () => {
           </p>
           
           <div className="grid md:grid-cols-2 gap-8">
-            <Card 
-              className={`cursor-pointer transition-all duration-300 hover:shadow-md ${
-                selectedMode === "slow" ? "border-clarly-500 shadow-md" : ""
-              } h-full`}
-              onClick={() => setSelectedMode("slow")}
-            >
+            <Card className={`cursor-pointer transition-all duration-300 hover:shadow-md ${selectedMode === "slow" ? "border-clarly-500 shadow-md" : ""} h-full`} onClick={() => setSelectedMode("slow")}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center">
@@ -82,12 +75,7 @@ const Home = () => {
               </CardContent>
             </Card>
             
-            <Card 
-              className={`cursor-pointer transition-all duration-300 hover:shadow-md ${
-                selectedMode === "vent" ? "border-clarly-500 shadow-md" : ""
-              } h-full`}
-              onClick={() => setSelectedMode("vent")}
-            >
+            <Card className={`cursor-pointer transition-all duration-300 hover:shadow-md ${selectedMode === "vent" ? "border-clarly-500 shadow-md" : ""} h-full`} onClick={() => setSelectedMode("vent")}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center">
@@ -130,39 +118,31 @@ const Home = () => {
           </p>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                icon: <MessageSquare className="h-8 w-8 text-clarly-500" />,
-                title: "Instant Support",
-                description: "Available 24/7 to listen and respond when you need emotional support most."
-              },
-              {
-                icon: <Heart className="h-8 w-8 text-clarly-500" />,
-                title: "Judgment-Free Zone",
-                description: "Share your thoughts without fear of judgment or criticism in a safe space."
-              },
-              {
-                icon: <Brain className="h-8 w-8 text-clarly-500" />,
-                title: "Personalized Experience",
-                description: "Choose between different conversation styles based on your current needs."
-              },
-              {
-                icon: <Shield className="h-8 w-8 text-clarly-500" />,
-                title: "Private & Secure",
-                description: "Your conversations are private and protected with industry-standard encryption."
-              },
-              {
-                icon: <Sparkles className="h-8 w-8 text-clarly-500" />,
-                title: "Continuous Improvement",
-                description: "Our AI evolves to provide better emotional support with every conversation."
-              },
-              {
-                icon: <Zap className="h-8 w-8 text-clarly-500" />,
-                title: "Unlimited Access",
-                description: "Subscribe for unlimited conversations whenever you need support."
-              }
-            ].map((feature, i) => (
-              <Card key={i} className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+            {[{
+            icon: <MessageSquare className="h-8 w-8 text-clarly-500" />,
+            title: "Instant Support",
+            description: "Available 24/7 to listen and respond when you need emotional support most."
+          }, {
+            icon: <Heart className="h-8 w-8 text-clarly-500" />,
+            title: "Judgment-Free Zone",
+            description: "Share your thoughts without fear of judgment or criticism in a safe space."
+          }, {
+            icon: <Brain className="h-8 w-8 text-clarly-500" />,
+            title: "Personalized Experience",
+            description: "Choose between different conversation styles based on your current needs."
+          }, {
+            icon: <Shield className="h-8 w-8 text-clarly-500" />,
+            title: "Private & Secure",
+            description: "Your conversations are private and protected with industry-standard encryption."
+          }, {
+            icon: <Sparkles className="h-8 w-8 text-clarly-500" />,
+            title: "Continuous Improvement",
+            description: "Our AI evolves to provide better emotional support with every conversation."
+          }, {
+            icon: <Zap className="h-8 w-8 text-clarly-500" />,
+            title: "Unlimited Access",
+            description: "Subscribe for unlimited conversations whenever you need support."
+          }].map((feature, i) => <Card key={i} className="bg-background border-none shadow-sm hover:shadow-md transition-all">
                 <CardHeader>
                   <div className="mb-2">{feature.icon}</div>
                   <CardTitle className="text-xl">{feature.title}</CardTitle>
@@ -170,8 +150,7 @@ const Home = () => {
                 <CardContent>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -190,8 +169,6 @@ const Home = () => {
           </Button>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Home;
