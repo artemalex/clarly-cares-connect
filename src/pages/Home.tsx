@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -62,11 +61,10 @@ const Home = () => {
                 <Heart className="h-16 w-16 text-clarly-500" />
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-empath-950">
-                Your Emotional Support Companion
+                HR isn't safe. Therapy is expensive. Friends and family can't always help. Clari is here.
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                HelloClarly provides a safe space to express your feelings, find clarity,
-                and feel understood — whenever you need it.
+                An AI-powered, 24/7 support space that meets you where you are — without pressure. Just a human-like place to say what you really feel.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" className="px-8 py-6 text-lg" asChild>
