@@ -2,7 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Mic, MicOff, Send } from 'lucide-react';
+import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Mic, MicOff, Send, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 
@@ -101,40 +102,67 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full">
-      {transcript && (
-        <div className="flex space-x-2">
+    <div className="flex flex-col space-y-4">
+      <DialogHeader>
+        <DialogTitle>Voice Message</DialogTitle>
+        <DialogDescription>
+          Record a voice message to send to HelloClari
+        </DialogDescription>
+      </DialogHeader>
+
+      {transcript ? (
+        <div className="flex flex-col space-y-2">
           <Textarea
             value={transcript}
             onChange={handleTranscriptChange}
-            className="resize-none flex-1"
+            className="resize-none"
             placeholder="Transcribed text will appear here..."
+            rows={4}
           />
+          <div className="flex justify-end space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setTranscript('')}
+            >
+              Clear
+            </Button>
+            <Button
+              onClick={handleSendTranscript}
+              disabled={!transcript.trim()}
+            >
+              <Send className="h-4 w-4 mr-2" /> Send
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-10">
+          <div className="mb-6 text-center">
+            {isProcessing ? (
+              <p className="text-muted-foreground animate-pulse">Processing your audio...</p>
+            ) : isRecording ? (
+              <p className="text-primary font-medium">Recording... Speak now</p>
+            ) : (
+              <p className="text-muted-foreground">Click the microphone to start recording</p>
+            )}
+          </div>
+          
           <Button
-            onClick={handleSendTranscript}
-            disabled={!transcript.trim()}
-            className="self-end"
+            type="button"
+            variant={isRecording ? "destructive" : "default"}
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={disabled || isProcessing}
+            className="rounded-full h-16 w-16"
+            size="icon"
           >
-            <Send className="h-4 w-4" />
+            {isRecording ? (
+              <MicOff className="h-6 w-6" />
+            ) : (
+              <Mic className="h-6 w-6" />
+            )}
           </Button>
         </div>
       )}
-      <div className="flex justify-center">
-        <Button
-          type="button"
-          variant={isRecording ? "destructive" : "outline"}
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={disabled || isProcessing}
-          className="rounded-full p-3 h-12 w-12"
-        >
-          {isRecording ? (
-            <MicOff className="h-5 w-5" />
-          ) : (
-            <Mic className="h-5 w-5" />
-          )}
-        </Button>
-        {isProcessing && <span className="ml-2 text-sm text-muted-foreground animate-pulse">Processing...</span>}
-      </div>
     </div>
   );
 };

@@ -2,14 +2,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send } from "lucide-react";
+import { Mic, Send } from "lucide-react";
 import { useChatContext } from "@/contexts/chat";
 import VoiceRecorder from "./VoiceRecorder";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
-  const [activeTab, setActiveTab] = useState<string>("text");
+  const [isRecording, setIsRecording] = useState(false);
   const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,7 +22,7 @@ const ChatInput = () => {
 
   const handleVoiceTranscript = (text: string) => {
     sendMessage(text);
-    setActiveTab("text");
+    setIsRecording(false);
   };
 
   return (
@@ -36,38 +36,45 @@ const ChatInput = () => {
           </span>
         </div>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 mb-2">
-            <TabsTrigger value="text">Text</TabsTrigger>
-            <TabsTrigger value="voice">Voice</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="text" className="mt-0">
-            <div className="flex space-x-2">
-              <Textarea
-                placeholder="Type your message here..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="resize-none flex-1"
-                disabled={isLoading || remainingMessages <= 0}
-              />
-              <Button 
-                type="submit" 
-                disabled={!message.trim() || isLoading || remainingMessages <= 0}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="voice" className="mt-0">
-            <VoiceRecorder 
-              onTranscriptSend={handleVoiceTranscript} 
+        <div className="flex space-x-2">
+          <Textarea
+            placeholder="Type your message here..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="resize-none flex-1"
+            disabled={isLoading || remainingMessages <= 0}
+          />
+          <div className="flex flex-col space-y-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="icon"
+              onClick={() => setIsRecording(true)}
               disabled={isLoading || remainingMessages <= 0}
-            />
-          </TabsContent>
-        </Tabs>
+              className="rounded-full h-10 w-10"
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={!message.trim() || isLoading || remainingMessages <= 0}
+              size="icon"
+              className="rounded-full h-10 w-10"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
+      
+      <Dialog open={isRecording} onOpenChange={setIsRecording}>
+        <DialogContent className="sm:max-w-md">
+          <VoiceRecorder 
+            onTranscriptSend={handleVoiceTranscript} 
+            disabled={isLoading || remainingMessages <= 0}
+          />
+        </DialogContent>
+      </Dialog>
     </form>
   );
 };
