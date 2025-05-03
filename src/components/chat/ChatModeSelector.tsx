@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Dialog,
   DialogContent,
@@ -25,13 +25,27 @@ const ChatModeSelector = ({
 }: ChatModeSelectorProps) => {
   const [selectedMode, setSelectedMode] = useState<MessageMode>("slow");
   
+  // Reset selected mode when the dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      console.log('Mode selector opened');
+    }
+  }, [isOpen]);
+  
   const handleConfirm = () => {
+    console.log('Confirming mode selection:', selectedMode);
     onSelectMode(selectedMode);
-    onClose();
+  };
+  
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      console.log('Dialog closed via UI interaction');
+      onClose();
+    }
   };
   
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">Choose the conversation mode that fits today</DialogTitle>

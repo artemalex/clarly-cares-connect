@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -17,25 +17,39 @@ const Home = () => {
   const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
   const navigate = useNavigate();
   
+  // Track last click time to prevent double clicks
+  const lastClickTimeRef = useRef<number>(0);
+  
   const handleStartChat = (mode: MessageMode) => {
     setMode(mode);
     startNewChat();
     navigate("/chat");
   };
   
-  // Modified to prevent double popup opening
-  const handleOpenModeSelector = () => {
-    // Only open if it's not already open
-    if (!modeSelectorOpen) {
+  // Improved handler with debounce mechanism
+  const handleOpenModeSelector = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLastClick = now - lastClickTimeRef.current;
+    
+    // Only open if it's not already open AND enough time has passed (300ms)
+    if (!modeSelectorOpen && timeSinceLastClick > 300) {
+      console.log('Opening mode selector');
+      lastClickTimeRef.current = now;
       setModeSelectorOpen(true);
     }
-  };
+  }, [modeSelectorOpen]);
   
   const handleSelectMode = (mode: MessageMode) => {
     setMode(mode);
     setModeSelectorOpen(false);
     startNewChat();
     navigate("/chat");
+  };
+  
+  // Handler for closing the modal that ensures state is properly reset
+  const handleCloseModal = () => {
+    console.log('Closing mode selector');
+    setModeSelectorOpen(false);
   };
   
   return <div className="min-h-screen">
@@ -249,7 +263,7 @@ const Home = () => {
       {/* Chat Mode Selector Dialog */}
       <ChatModeSelector
         isOpen={modeSelectorOpen}
-        onClose={() => setModeSelectorOpen(false)}
+        onClose={handleCloseModal}
         onSelectMode={handleSelectMode}
       />
     </div>;

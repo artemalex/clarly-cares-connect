@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -15,6 +15,7 @@ export const StickyCTA = ({
   scrollThreshold = 25,
 }: StickyCTAProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isClicking, setIsClicking] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,6 +38,19 @@ export const StickyCTA = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, [scrollThreshold]);
 
+  // Debounced click handler to prevent multiple rapid clicks
+  const handleClick = useCallback(() => {
+    if (isClicking) return;
+    
+    setIsClicking(true);
+    onClick();
+    
+    // Reset clicking state after a short delay
+    setTimeout(() => {
+      setIsClicking(false);
+    }, 500);
+  }, [onClick, isClicking]);
+
   return (
     <div
       className={`fixed bottom-6 left-0 right-0 z-50 flex justify-center transition-all duration-300 ${
@@ -48,7 +62,8 @@ export const StickyCTA = ({
       <Button
         size="lg"
         className="px-6 py-6 text-lg shadow-lg animate-fade-up"
-        onClick={onClick}
+        onClick={handleClick}
+        disabled={isClicking}
       >
         {text} <ArrowRight className="ml-2" />
       </Button>
