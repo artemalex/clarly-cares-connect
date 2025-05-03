@@ -41,7 +41,7 @@ const Navbar = () => {
     return email.substring(0, 2).toUpperCase();
   };
   return <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container flex items-center justify-between py-[14px] px-[6px]">
+      <div className="container flex items-center justify-between py-[14px] px-0">
         <Link to="/" className="flex items-center space-x-2 group">
           <Heart className="h-8 w-8 text-clarly-500 group-hover:scale-110 transition-transform" />
           <span className="font-display font-semibold bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-transparent text-2xl">
