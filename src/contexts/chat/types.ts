@@ -1,6 +1,8 @@
 
 import { MessageMode } from "./constants";
 
+export type { MessageMode };
+
 export interface Message {
   id: string;
   role: "user" | "assistant" | "system";
