@@ -48,7 +48,7 @@ const Navbar = () => {
         </Link>
         <div className="flex items-center space-x-4">
           <Button variant="ghost" asChild>
-            <Link to="/chat" className="Chat History button should open page history">Chat History</Link>
+            <Link to="/chat" className="">Chat History</Link>
           </Button>
           
           {user ? <DropdownMenu>
