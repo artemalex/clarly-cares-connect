@@ -54,7 +54,7 @@ const Navbar = () => {
         </Link>
         <div className="flex items-center space-x-4">
           <Button variant="ghost" asChild>
-            <Link to="/chat">Chat Now</Link>
+            <Link to="/chat">Chat History</Link>
           </Button>
           
           {user ? (
