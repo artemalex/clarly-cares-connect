@@ -29,11 +29,12 @@ export function useChatOperations() {
   
   const urlConversationId = params.id;
   
+  // This is the fixed navigate function
   const navigate = (() => {
     try {
       return useNavigate();
     } catch (e) {
-      return (path: string) => {
+      return (path: string, options?: any) => {
         console.warn("Navigation attempted outside Router context:", path);
       };
     }
@@ -328,7 +329,7 @@ export function useChatOperations() {
       setConversationId(newConversationId);
       setMessages([]);
       
-      // Update URL without reloading
+      // Update URL without reloading - Fixed here to match the navigate signature
       navigate(`/chat/${newConversationId}`, { replace: true });
       
       // If this isn't the initial call, generate the first message
