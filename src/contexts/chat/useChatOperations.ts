@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from "@/lib/supabase";
@@ -145,7 +146,8 @@ export function useChatOperations() {
         id: msg.id,
         role: msg.role as "user" | "assistant" | "system",
         content: msg.content,
-        timestamp: new Date(msg.created_at)
+        timestamp: new Date(msg.created_at),
+        suggestions: msg.suggestions || []
       }));
       
       setMessages(formattedMessages);
@@ -180,7 +182,8 @@ export function useChatOperations() {
         conversation_id: newConversationId,
         role: 'assistant',
         content: data.message,
-        user_id: (await supabase.auth.getUser()).data.user?.id
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+        suggestions: data.suggestions || []
       });
       
       const assistantMessage: Message = {
@@ -188,6 +191,7 @@ export function useChatOperations() {
         role: "assistant",
         content: data.message,
         timestamp: new Date(),
+        suggestions: data.suggestions || []
       };
       
       setMessages([assistantMessage]);
@@ -271,13 +275,14 @@ export function useChatOperations() {
       
       const assistantMessageId = uuidv4();
       
-      // Save AI response to database
+      // Save AI response to database with suggestions
       await supabase.from('chat_messages').insert({
         id: assistantMessageId,
         conversation_id: activeConversationId,
         role: 'assistant',
         content: data.message,
-        user_id: userId
+        user_id: userId,
+        suggestions: data.suggestions || []
       });
       
       const assistantMessage: Message = {
@@ -285,6 +290,7 @@ export function useChatOperations() {
         role: "assistant",
         content: data.message,
         timestamp: new Date(),
+        suggestions: data.suggestions || []
       };
       
       // Update local state with AI response

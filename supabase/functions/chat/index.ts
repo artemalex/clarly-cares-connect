@@ -8,6 +8,50 @@ interface Message {
   content: string;
 }
 
+// Define the function schema for generating suggestions
+const functions = [
+  {
+    name: "generate_suggestions",
+    description: "Generate 2–3 dynamic follow-up prompts based on the user's emotional context",
+    parameters: {
+      type: "object",
+      properties: {
+        suggestions: {
+          type: "array",
+          items: {
+            type: "string"
+          },
+          description: "Follow-up messages the user might click to continue the conversation"
+        }
+      },
+      required: ["suggestions"]
+    }
+  }
+];
+
+// Updated system prompt to use function calling
+const getSystemPrompt = (basePrompt: string) => {
+  return `${basePrompt}
+
+Your job is to respond empathetically to the user based on their current emotional context. 
+After your reply, call the function 'generate_suggestions' to return 2–3 short, relevant, clickable follow-up options.
+
+Suggestions must be:
+– Directly based on the conversation and user's last message
+– Tailored to the emotional context of the conversation
+– Phrased as things the user might naturally want to say next
+– Useful to guide or deepen the emotional conversation
+
+Examples:
+→ For a user venting about a manager: 
+   ["I feel like I'm never appreciated.", "How do I stay calm in meetings?", "I just need to let this out."]
+
+→ For a user slowing down after burnout: 
+   ["Can you help me breathe?", "Why do I feel guilty for resting?", "What would self-kindness look like here?"]
+
+Always respond first with empathy, then call the function.`;
+};
+
 serve(async (req) => {
   // Handle CORS
   if (req.method === "OPTIONS") {
@@ -29,11 +73,21 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY is not set");
     }
 
-    // Format for the OpenAI API
-    const openaiMessages = messages.map((msg: Message) => ({
-      role: msg.role,
-      content: msg.content
-    }));
+    // Format for the OpenAI API - Find system message to enhance
+    let systemPrompt = "";
+    const openaiMessages = messages.map((msg: Message) => {
+      if (msg.role === "system") {
+        systemPrompt = msg.content;
+        return {
+          role: "system",
+          content: getSystemPrompt(msg.content)
+        };
+      }
+      return {
+        role: msg.role,
+        content: msg.content
+      };
+    });
 
     // If it's an initial message, add a hidden prompt to start the conversation
     if (isInitial) {
@@ -54,7 +108,9 @@ serve(async (req) => {
         model: "gpt-4o", 
         messages: openaiMessages,
         max_tokens: 1000,
-        temperature: 0.7
+        temperature: 0.7,
+        functions: functions,
+        function_call: { name: "generate_suggestions" }
       })
     });
 
@@ -65,9 +121,26 @@ serve(async (req) => {
     }
 
     const message = data.choices[0].message.content;
+    
+    // Extract suggestions from function call
+    let suggestions = [];
+    if (data.choices[0].message.function_call) {
+      try {
+        const functionCall = data.choices[0].message.function_call;
+        if (functionCall.name === "generate_suggestions") {
+          const functionArgs = JSON.parse(functionCall.arguments);
+          suggestions = functionArgs.suggestions || [];
+        }
+      } catch (e) {
+        console.error("Error parsing function call arguments:", e);
+      }
+    }
 
     return new Response(
-      JSON.stringify({ message }),
+      JSON.stringify({ 
+        message,
+        suggestions 
+      }),
       {
         headers: {
           ...corsHeaders,
