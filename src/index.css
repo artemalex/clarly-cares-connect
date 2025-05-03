@@ -115,4 +115,48 @@
   .assistant-message {
     @apply bg-support-100 text-support-950 mr-auto;
   }
+  
+  /* Mobile chat layout enhancements */
+  @media (max-width: 768px) {
+    .mobile-chat-page {
+      height: calc(100vh - 65px); /* Adjust based on your navbar height */
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .mobile-chat-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .mobile-chat-container > div {
+      height: auto !important; /* Override fixed height */
+      max-height: none !important; /* Remove max-height constraints */
+    }
+    
+    .message-list-container {
+      overflow-y: visible !important;
+      flex: 1;
+    }
+    
+    .sticky-input {
+      position: sticky;
+      bottom: 0;
+      background-color: hsl(var(--background));
+      z-index: 10;
+      margin-bottom: -1px; /* Fix for potential gap */
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+    
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      background-color: hsl(var(--background));
+      z-index: 10;
+      padding-top: 8px;
+      padding-bottom: 8px;
+    }
+  }
 }

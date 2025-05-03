@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
@@ -11,31 +11,12 @@ const ChatContainer = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const isMobile = useIsMobile();
 
-  // Track scrolling to collapse header on mobile
-  useEffect(() => {
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLDivElement;
-      if (target.scrollTop > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    
-    const messageList = document.querySelector(".message-list-container");
-    if (messageList) {
-      messageList.addEventListener("scroll", handleScroll);
-      
-      return () => {
-        messageList.removeEventListener("scroll", handleScroll);
-      };
-    }
-  }, []);
-
+  // Track scrolling to collapse header on mobile - now handled in the Chat.tsx component
+  
   return (
     <div className="border rounded-xl shadow-sm flex flex-col h-[80vh] sm:h-[75vh] bg-background overflow-hidden">
       <ChatHeader isCollapsed={isScrolled && isMobile} />
-      <div className="message-list-container flex-1 overflow-y-auto">
+      <div className="message-list-container flex-1 overflow-y-auto sm:overflow-y-auto">
         <MessageList />
       </div>
       <ChatInput />

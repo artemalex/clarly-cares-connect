@@ -7,6 +7,7 @@ import { useChatContext } from "@/contexts/chat";
 import VoiceRecorder from "./VoiceRecorder";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
@@ -14,6 +15,7 @@ const ChatInput = () => {
   const [isFocused, setIsFocused] = useState(false);
   const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,10 +43,14 @@ const ChatInput = () => {
   }, [message]);
 
   return (
-    <form onSubmit={handleSubmit} className={cn(
-      "p-2 sm:p-3 border-t bg-card rounded-b-xl transition-all",
-      isFocused ? "pb-3" : "pb-2"
-    )}>
+    <form 
+      onSubmit={handleSubmit} 
+      className={cn(
+        "p-2 sm:p-3 border-t bg-card rounded-b-xl transition-all",
+        isFocused ? "pb-3" : "pb-2",
+        isMobile && "sticky-input"
+      )}
+    >
       <div className="flex flex-col space-y-2">
         {/* Show remaining messages indicator */}
         <div className={cn(

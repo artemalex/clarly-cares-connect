@@ -1,8 +1,6 @@
 
 import { useChatContext } from "@/contexts/chat";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
 
 interface ChatHeaderProps {
   isCollapsed?: boolean;
@@ -17,7 +15,7 @@ const ChatHeader = ({ isCollapsed = false }: ChatHeaderProps) => {
       isCollapsed ? "py-1" : "py-3 px-4"
     )}>
       <div className="flex justify-between items-center">
-        {/* Title removed as requested */}
+        {/* Header content can be added here if needed in the future */}
       </div>
     </div>
   );
