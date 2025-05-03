@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -193,6 +194,7 @@ export function useChatOperations() {
           user_id: session.data.session.user.id
         });
       }
+      // Note: We don't increment message count for guests on initial AI message
       
       const assistantMessage: Message = {
         id: messageId,
@@ -262,7 +264,7 @@ export function useChatOperations() {
           user_id: userId
         });
       } else {
-        // Increment message count for guest users
+        // Increment message count for guest users - only for user messages
         setMessagesUsed(prev => prev + 1);
       }
       
@@ -292,10 +294,8 @@ export function useChatOperations() {
           content: data.message,
           user_id: userId
         });
-      } else {
-        // Increment message count for guest users
-        setMessagesUsed(prev => prev + 1);
       }
+      // Note: We no longer increment message count for guest users on AI responses
       
       const assistantMessage: Message = {
         id: assistantMessageId,
