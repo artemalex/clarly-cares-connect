@@ -1,0 +1,42 @@
+
+import { ReactNode } from "react";
+
+interface GTMProps {
+  id?: string;
+}
+
+const GTM = ({ id = "GTM-XXXXXXX" }: GTMProps) => {
+  // Don't render anything if GTM ID is not provided or is the placeholder
+  if (!id || id === "GTM-XXXXXXX") return null;
+
+  return (
+    <>
+      {/* GTM HEAD script */}
+      <script
+        id="gtm-script"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${id}');
+          `,
+        }}
+      />
+
+      {/* GTM BODY noscript fallback - to be inserted at the top of body */}
+      <noscript id="gtm-noscript">
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${id}`}
+          height="0"
+          width="0"
+          style={{ display: "none", visibility: "hidden" }}
+          title="GTM noscript"
+        ></iframe>
+      </noscript>
+    </>
+  );
+};
+
+export default GTM;
