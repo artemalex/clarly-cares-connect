@@ -21,11 +21,11 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
     )}>
       <div className={cn(
         "message-bubble",
-        isUser ? "user-message rounded-tr-none" : "assistant-message rounded-tl-none"
+        isUser ? "user-message rounded-tr-none max-w-[80%] sm:max-w-[70%]" : "assistant-message rounded-tl-none max-w-[85%] sm:max-w-[75%]"
       )}>
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        <p className="whitespace-pre-wrap break-words">{message.content}</p>
       </div>
-      <span className="text-xs text-muted-foreground px-2">
+      <span className="text-xs text-muted-foreground px-2 mt-1">
         {isUser ? "You" : "Assistant"} • {formattedTime}
       </span>
     </div>

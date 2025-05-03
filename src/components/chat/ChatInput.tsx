@@ -1,22 +1,29 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Mic, Send } from "lucide-react";
 import { useChatContext } from "@/contexts/chat";
 import VoiceRecorder from "./VoiceRecorder";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
       sendMessage(message);
       setMessage("");
+      setIsFocused(false);
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     }
   };
 
@@ -24,41 +31,63 @@ const ChatInput = () => {
     sendMessage(text);
     setIsRecording(false);
   };
+  
+  // Auto resize textarea as user types
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [message]);
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border-t bg-card rounded-b-xl">
+    <form onSubmit={handleSubmit} className={cn(
+      "p-2 sm:p-3 border-t bg-card rounded-b-xl transition-all",
+      isFocused ? "pb-3" : "pb-2"
+    )}>
       <div className="flex flex-col space-y-2">
-        <div className="flex justify-between items-center mb-2">
-          {/* Only show remaining messages for non-subscribed users with messages left */}
+        {/* Show remaining messages indicator */}
+        <div className={cn(
+          "flex justify-between items-center transition-all overflow-hidden",
+          (isFocused && !isSubscribed && remainingMessages > 0) || remainingMessages <= 0 
+            ? "max-h-6 mb-1 opacity-100" 
+            : "max-h-0 mb-0 opacity-0"
+        )}>
           {!isSubscribed && remainingMessages > 0 && (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {remainingMessages} free messages remaining
             </span>
           )}
-          {/* Always show message limit warning when reached */}
           {remainingMessages <= 0 && (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               You've reached your message limit
             </span>
           )}
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 items-end">
           <Textarea
-            placeholder="Type your message here..."
+            placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="resize-none flex-1"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => message.length === 0 && setIsFocused(false)}
+            className={cn(
+              "resize-none flex-1 transition-all rounded-2xl py-2 px-3 min-h-0",
+              isFocused ? "min-h-[80px]" : "min-h-[40px]"
+            )}
             disabled={isLoading || remainingMessages <= 0}
+            ref={textareaRef}
+            rows={1}
           />
-          <div className="flex flex-col space-y-2">
+          <div className="flex space-x-2">
             <Button 
               type="button" 
               variant="outline" 
               size="icon"
               onClick={() => setIsRecording(true)}
               disabled={isLoading || remainingMessages <= 0}
-              className="rounded-full h-10 w-10"
+              className="rounded-full h-10 w-10 flex-shrink-0"
             >
               <Mic className="h-4 w-4" />
             </Button>
@@ -66,7 +95,7 @@ const ChatInput = () => {
               type="submit" 
               disabled={!message.trim() || isLoading || remainingMessages <= 0}
               size="icon"
-              className="rounded-full h-10 w-10"
+              className="rounded-full h-10 w-10 flex-shrink-0"
             >
               <Send className="h-4 w-4" />
             </Button>

@@ -8,12 +8,15 @@ const MessageList = () => {
   const { messages, isLoading } = useChatContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Improved auto-scroll that will trigger on new messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   return (
-    <div className="flex-1 p-4 overflow-y-auto">
+    <div className="flex-1 p-2 sm:p-3 overflow-y-auto">
       {messages.length === 0 ? (
         <div className="flex items-center justify-center h-full">
           <p className="text-muted-foreground text-center">
@@ -21,7 +24,7 @@ const MessageList = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}

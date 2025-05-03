@@ -1,12 +1,14 @@
 
 import { useChatContext } from "@/contexts/chat";
-import { MessageMode } from "@/contexts/chat";
-import { Button } from "@/components/ui/button";
-import { AudioWaveform } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
-const ChatHeader = () => {
+interface ChatHeaderProps {
+  isCollapsed?: boolean;
+}
+
+const ChatHeader = ({ isCollapsed = false }: ChatHeaderProps) => {
   const { mode, conversationId } = useChatContext();
   const [title, setTitle] = useState<string | null>("Chat with HelloClari");
   
@@ -38,9 +40,15 @@ const ChatHeader = () => {
   };
   
   return (
-    <div className="border-b p-4 bg-card rounded-t-xl">
+    <div className={cn(
+      "border-b bg-card rounded-t-xl transition-all duration-300 overflow-hidden",
+      isCollapsed ? "py-1" : "py-3 px-4"
+    )}>
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-medium truncate">
+        <h2 className={cn(
+          "font-medium truncate transition-all",
+          isCollapsed ? "text-sm mx-4" : "text-lg"
+        )}>
           {title || "Chat with HelloClari"}
         </h2>
       </div>
