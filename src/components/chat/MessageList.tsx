@@ -7,8 +7,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-const MessageList = () => {
+interface MessageListProps {
+  onScroll?: (isScrolled: boolean) => void;
+}
+
+const MessageList = ({ onScroll }: MessageListProps) => {
   const { messages, isLoading } = useChatContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,6 +29,11 @@ const MessageList = () => {
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
     
     setShowScrollButton(!isAtBottom);
+    
+    // Call the onScroll prop with the scroll state
+    if (onScroll) {
+      onScroll(scrollTop > 10);
+    }
     
     if (isAtBottom) {
       setIsUserScrolling(false);
@@ -43,13 +53,10 @@ const MessageList = () => {
     
     scrollToBottom();
     
-    // For mobile, let the Chat.tsx handle scrolling
-    if (isMobile) return;
-    
     // Add smooth scroll behavior after a small delay
     const timeoutId = setTimeout(scrollToBottom, 100);
     return () => clearTimeout(timeoutId);
-  }, [messages, isMobile, isUserScrolling]);
+  }, [messages, isUserScrolling]);
 
   // Handle scroll button click
   const handleScrollToBottom = () => {
@@ -79,7 +86,7 @@ const MessageList = () => {
   return (
     <div 
       ref={containerRef} 
-      className="p-2 sm:p-3 overflow-y-auto max-h-full scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400"
+      className="p-2 sm:p-3 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400"
     >
       {messages.length === 0 ? (
         <div className="flex items-center justify-center min-h-[200px] sm:min-h-[400px]">

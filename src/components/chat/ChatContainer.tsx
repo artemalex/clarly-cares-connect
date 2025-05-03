@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
@@ -8,6 +8,7 @@ import { useChatContext } from "@/contexts/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "../ui/scroll-area";
 
 const ChatContainer = () => {
   const { isLoading, setMode, startNewChat, messages } = useChatContext();
@@ -21,7 +22,7 @@ const ChatContainer = () => {
     setShowModeSelector(false);
     startNewChat();
   };
-  
+
   return (
     <>
       <div 
@@ -32,8 +33,8 @@ const ChatContainer = () => {
         )}
       >
         <ChatHeader isCollapsed={isScrolled && isMobile} />
-        <div className="message-list-container relative flex-1 overflow-y-auto">
-          <MessageList />
+        <div className="flex-1 overflow-hidden relative">
+          <MessageList onScroll={(scrolled) => setIsScrolled(scrolled)} />
         </div>
         <ChatInput />
       </div>

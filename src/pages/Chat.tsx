@@ -45,16 +45,6 @@ const Chat = () => {
     };
   }, [isMobile]);
 
-  // Auto scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (isMobile && messages.length > 0) {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth'
-      });
-    }
-  }, [messages, isMobile]);
-
   const handleNewChat = () => {
     setModeSelectorOpen(true);
   };
@@ -69,9 +59,10 @@ const Chat = () => {
     <div 
       ref={pageRef}
       className={cn(
-        "container py-4 sm:py-6 px-2 sm:px-4 flex flex-col mobile-chat-page",
-        isMobile && "pb-16" // Add padding at bottom for mobile to prevent footer overlap
+        "container py-4 sm:py-6 px-2 sm:px-4 flex flex-col",
+        isMobile && "pb-24" // Increased padding to prevent footer overlap
       )}
+      style={isMobile ? { height: 'calc(100dvh - 64px)', overflow: 'hidden' } : {}}
     >
       <div className="max-w-4xl mx-auto w-full flex flex-col flex-grow">
         <div className={cn(
@@ -97,7 +88,7 @@ const Chat = () => {
           </div>
         </div>
         
-        <div className="flex-grow mobile-chat-container">
+        <div className="flex-grow">
           <ChatContainer />
         </div>
         
