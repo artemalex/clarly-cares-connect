@@ -29,11 +29,16 @@ const ChatInput = () => {
     <form onSubmit={handleSubmit} className="p-4 border-t bg-card rounded-b-xl">
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-muted-foreground">
-            {remainingMessages > 0 
-              ? `${remainingMessages} ${isSubscribed ? 'premium' : 'free'} messages remaining` 
-              : "You've reached your message limit"}
-          </span>
+          {!isSubscribed && remainingMessages > 0 && (
+            <span className="text-sm text-muted-foreground">
+              {remainingMessages} free messages remaining
+            </span>
+          )}
+          {remainingMessages <= 0 && (
+            <span className="text-sm text-muted-foreground">
+              You've reached your message limit
+            </span>
+          )}
         </div>
         
         <div className="flex space-x-2">
