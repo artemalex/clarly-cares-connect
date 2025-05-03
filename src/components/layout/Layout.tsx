@@ -9,9 +9,8 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  // For demonstration, we're using a hardcoded GTM ID
-  // In production, this would come from an environment variable
-  const gtmId = "GTM-XXXXXXX"; // Replace with your actual GTM ID when deploying
+  // Using the actual GTM ID provided
+  const gtmId = "GTM-PSB76CLL";
   
   useEffect(() => {
     // This effect handles the insertion of the noscript GTM tag at the top of the body
