@@ -1,12 +1,9 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-
 const PricingSection = () => {
-  return (
-    <section className="py-16 bg-gradient-to-b from-white to-muted/30">
+  return <section className="py-16 bg-gradient-to-b from-white to-muted/30">
       <div className="container">
         <h2 className="text-3xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
         <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -18,23 +15,17 @@ const PricingSection = () => {
           <Card className="border shadow-sm">
             <CardHeader>
               <CardTitle className="text-2xl">Free Trial</CardTitle>
-              <CardDescription>Try EmpathAI with no commitment</CardDescription>
+              <CardDescription>Try HelloClari with no commitment</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
                 <p className="text-4xl font-bold">€0<span className="text-lg text-muted-foreground font-normal">/forever</span></p>
               </div>
               <ul className="space-y-3">
-                {[
-                  "3 free emotional support sessions",
-                  "Basic personalization",
-                  "Text-based chat interface"
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-start">
+                {["3 free emotional support sessions", "Basic personalization", "Text-based chat interface"].map((feature, i) => <li key={i} className="flex items-start">
                     <Check className="h-5 w-5 text-clarly-500 mr-2 shrink-0 mt-0.5" />
                     <span>{feature}</span>
-                  </li>
-                ))}
+                  </li>)}
               </ul>
               <Button className="w-full mt-8" size="lg" variant="outline" asChild>
                 <Link to="/signup">Start Free Trial</Link>
@@ -56,18 +47,10 @@ const PricingSection = () => {
                 <p className="text-4xl font-bold">€10<span className="text-lg text-muted-foreground font-normal">/month</span></p>
               </div>
               <ul className="space-y-3">
-                {[
-                  "Unlimited emotional support",
-                  "Deep personalization",
-                  "Advanced emotional pattern recognition",
-                  "Priority response times",
-                  "Safe, private, and judgment-free space"
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-start">
+                {["Unlimited emotional support", "Deep personalization", "Advanced emotional pattern recognition", "Priority response times", "Safe, private, and judgment-free space"].map((feature, i) => <li key={i} className="flex items-start">
                     <Check className="h-5 w-5 text-clarly-500 mr-2 shrink-0 mt-0.5" />
                     <span>{feature}</span>
-                  </li>
-                ))}
+                  </li>)}
               </ul>
               <Button className="w-full mt-8" size="lg" asChild>
                 <Link to="/signup">Subscribe Now</Link>
@@ -76,8 +59,6 @@ const PricingSection = () => {
           </Card>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default PricingSection;
