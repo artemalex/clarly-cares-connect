@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -62,79 +63,6 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// New color palette
-				lavender: {
-					DEFAULT: '#B7A9D2',
-					50: '#F5F2F9',
-					100: '#E9E4F3',
-					200: '#D7CEEA',
-					300: '#C7BDE0',
-					400: '#B7A9D2', // Primary
-					500: '#9E8BC3',
-					600: '#846DB3',
-					700: '#6D56A0',
-					800: '#5A467F',
-					900: '#42345E',
-					950: '#342A49',
-				},
-				beige: {
-					DEFAULT: '#F5EFE9',
-					50: '#FFFFFF',
-					100: '#FFFFFF',
-					200: '#FFFBF8',
-					300: '#FAF7F4',
-					400: '#F5EFE9', // Primary
-					500: '#E6D9CA',
-					600: '#D6C3AB',
-					700: '#C7AD8C',
-					800: '#B7976D',
-					900: '#9F7E52',
-					950: '#8C6F48',
-				},
-				teal: {
-					DEFAULT: '#8CA8A0',
-					50: '#F0F4F3',
-					100: '#E1E9E6',
-					200: '#C7D5D0',
-					300: '#ACC0B9',
-					400: '#8CA8A0', // Primary
-					500: '#728F86',
-					600: '#5D746B',
-					700: '#485951',
-					800: '#343F3A',
-					900: '#202624',
-					950: '#161A19',
-				},
-				eggplant: {
-					DEFAULT: '#403A4F',
-					50: '#D6D3DC',
-					100: '#C2BDC9',
-					200: '#A99FB0',
-					300: '#8F8297',
-					400: '#63597B',
-					500: '#403A4F', // Primary
-					600: '#342F41',
-					700: '#282333',
-					800: '#1C1825',
-					900: '#100E16',
-					950: '#0A090E',
-				},
-				coral: {
-					DEFAULT: '#F2CFC1',
-					50: '#FEF9F7',
-					100: '#FBEEE9',
-					200: '#F7DED3',
-					300: '#F2CFC1', // Primary
-					400: '#EAAE96',
-					500: '#E28E6B',
-					600: '#DA6D3F',
-					700: '#BC522A',
-					800: '#8E3E20',
-					900: '#602A15',
-					950: '#49200F',
-				},
-				// Keeping the original clarly and support colors for backward compatibility
-				// but they will be gradually phased out in favor of the new palette
 				clarly: {
 					50: '#eefbfd',
 					100: '#d3f4fa',
