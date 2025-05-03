@@ -1,19 +1,38 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Heart, Clock, Zap, Sparkles, MessageSquare, Brain, Shield, ArrowRight, Check, Star } from "lucide-react";
 import { useChatContext, MessageMode } from "@/contexts/chat";
 import StickyCTA from "@/components/ui/sticky-cta";
+import ChatModeSelector from "@/components/chat/ChatModeSelector";
 
 const Home = () => {
   const {
-    setMode
+    setMode,
+    startNewChat
   } = useChatContext();
   const [selectedMode, setSelectedMode] = useState<MessageMode>("slow");
+  const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
+  const navigate = useNavigate();
+  
   const handleStartChat = (mode: MessageMode) => {
     setMode(mode);
+    startNewChat();
+    navigate("/chat");
   };
+  
+  const handleOpenModeSelector = () => {
+    setModeSelectorOpen(true);
+  };
+  
+  const handleSelectMode = (mode: MessageMode) => {
+    setMode(mode);
+    setModeSelectorOpen(false);
+    startNewChat();
+    navigate("/chat");
+  };
+  
   return <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-clarly-50/50 to-support-50/50 py-16 md:py-24">
@@ -220,7 +239,14 @@ const Home = () => {
       </section>
       
       {/* Sticky CTA that appears after scrolling */}
-      <StickyCTA text="Start for Free" linkTo="/signup" scrollThreshold={25} />
+      <StickyCTA text="Start for Free" onClick={handleOpenModeSelector} scrollThreshold={25} />
+      
+      {/* Chat Mode Selector Dialog */}
+      <ChatModeSelector
+        isOpen={modeSelectorOpen}
+        onClose={() => setModeSelectorOpen(false)}
+        onSelectMode={handleSelectMode}
+      />
     </div>;
 };
 export default Home;

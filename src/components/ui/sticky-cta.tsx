@@ -1,18 +1,17 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 interface StickyCTAProps {
   text: string;
-  linkTo: string;
+  onClick: () => void;
   scrollThreshold?: number; // Percentage of page height (0-100)
 }
 
 export const StickyCTA = ({
   text,
-  linkTo,
+  onClick,
   scrollThreshold = 25,
 }: StickyCTAProps) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -49,11 +48,9 @@ export const StickyCTA = ({
       <Button
         size="lg"
         className="px-6 py-6 text-lg shadow-lg animate-fade-up"
-        asChild
+        onClick={onClick}
       >
-        <Link to={linkTo}>
-          {text} <ArrowRight className="ml-2" />
-        </Link>
+        {text} <ArrowRight className="ml-2" />
       </Button>
     </div>
   );
