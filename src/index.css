@@ -94,6 +94,10 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    background-image: 
+      radial-gradient(circle at 100% 0%, rgba(175, 219, 232, 0.2) 0%, transparent 25%),
+      radial-gradient(circle at 0% 80%, rgba(148, 226, 178, 0.15) 0%, transparent 30%);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -109,11 +113,36 @@
   }
 
   .user-message {
-    @apply bg-clarly-100 text-clarly-950 ml-auto;
+    @apply text-clarly-950 ml-auto;
   }
 
   .assistant-message {
-    @apply bg-support-100 text-support-950 mr-auto;
+    @apply text-support-950 mr-auto;
+  }
+  
+  /* Background patterns for messages */
+  .bg-clarly-pattern {
+    background-image: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.9) 0%, transparent 13%);
+    background-size: 20px 20px;
+  }
+  
+  .bg-support-pattern {
+    background-image: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.9) 0%, transparent 13%);
+    background-size: 20px 20px;
+  }
+  
+  /* Button hover effects */
+  button {
+    @apply transition-all duration-200;
+  }
+  
+  button:active {
+    @apply transform scale-95;
+  }
+  
+  /* Input field focus effect */
+  input:focus, textarea:focus {
+    @apply outline-none ring-2 ring-offset-1;
   }
   
   /* Mobile chat layout enhancements */
@@ -148,15 +177,52 @@
       z-index: 10;
       margin-bottom: -1px; /* Fix for potential gap */
       border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: 0 -5px 20px -10px rgba(0, 0, 0, 0.1);
     }
     
     .sticky-header {
       position: sticky;
       top: 0;
-      background-color: hsl(var(--background));
+      background-color: hsl(var(--card));
       z-index: 10;
       padding-top: 8px;
       padding-bottom: 8px;
+      box-shadow: 0 5px 20px -10px rgba(0, 0, 0, 0.1);
     }
+    
+    /* Enhanced card hover effects */
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  /* Micro-interactions */
+  .hover-scale {
+    @apply transition-transform duration-200;
+  }
+  
+  .hover-scale:hover {
+    @apply transform scale-105;
+  }
+  
+  .fade-in {
+    @apply animate-fade-in;
+  }
+  
+  .pulse-gentle {
+    @apply animate-pulse-gentle;
+  }
+  
+  /* Message transition effects */
+  .message-enter {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  
+  .message-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
   }
 }

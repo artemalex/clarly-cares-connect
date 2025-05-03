@@ -16,10 +16,15 @@ const ChatInput = () => {
   const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isMobile = useIsMobile();
+  const [sendButtonPressed, setSendButtonPressed] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
+      // Trigger send button animation
+      setSendButtonPressed(true);
+      setTimeout(() => setSendButtonPressed(false), 300);
+      
       sendMessage(message);
       setMessage("");
       setIsFocused(false);
@@ -47,7 +52,7 @@ const ChatInput = () => {
       onSubmit={handleSubmit} 
       className={cn(
         "p-2 sm:p-3 border-t bg-card rounded-b-xl transition-all",
-        isFocused ? "pb-3" : "pb-2",
+        isFocused ? "pb-3 shadow-lg" : "pb-2",
         isMobile && "sticky-input"
       )}
     >
@@ -79,8 +84,8 @@ const ChatInput = () => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => message.length === 0 && setIsFocused(false)}
             className={cn(
-              "resize-none flex-1 transition-all rounded-2xl py-2 px-3 min-h-0",
-              isFocused ? "min-h-[80px]" : "min-h-[40px]"
+              "resize-none flex-1 transition-all rounded-2xl py-2 px-3 min-h-0 border-muted focus-visible:ring-clarly-400 focus-visible:border-clarly-300",
+              isFocused ? "min-h-[80px] shadow-sm" : "min-h-[40px]"
             )}
             disabled={isLoading || remainingMessages <= 0}
             ref={textareaRef}
@@ -93,7 +98,7 @@ const ChatInput = () => {
               size="icon"
               onClick={() => setIsRecording(true)}
               disabled={isLoading || remainingMessages <= 0}
-              className="rounded-full h-10 w-10 flex-shrink-0"
+              className="rounded-full h-10 w-10 flex-shrink-0 hover:bg-support-100 hover:text-support-600 transition-all"
             >
               <Mic className="h-4 w-4" />
             </Button>
@@ -101,7 +106,10 @@ const ChatInput = () => {
               type="submit" 
               disabled={!message.trim() || isLoading || remainingMessages <= 0}
               size="icon"
-              className="rounded-full h-10 w-10 flex-shrink-0"
+              className={cn(
+                "rounded-full h-10 w-10 flex-shrink-0 transition-all",
+                sendButtonPressed ? "bg-support-600 scale-95" : "bg-primary hover:bg-primary/90"
+              )}
             >
               <Send className="h-4 w-4" />
             </Button>
