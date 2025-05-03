@@ -5,33 +5,33 @@ import { MessageSquare, Heart, Brain, Shield, Sparkles, Zap } from "lucide-react
 const features = [
   {
     icon: <MessageSquare className="h-8 w-8 text-clarly-500" />,
-    title: "Instant Support",
-    description: "Available 24/7 to listen and respond when you need emotional support most."
+    title: "Instant Presence",
+    description: "Open the chat, type a word, and Clari answers in under two seconds—no office hours, no waiting room."
   },
   {
     icon: <Heart className="h-8 w-8 text-clarly-500" />,
-    title: "Judgment-Free Zone",
-    description: "Share your thoughts without fear of judgment or criticism in a safe space."
+    title: "Judgment-Free Listening",
+    description: "Clari never lectures, diagnoses, or reports—she simply stays until the weight feels lighter."
   },
   {
     icon: <Brain className="h-8 w-8 text-clarly-500" />,
-    title: "Personalized Experience",
-    description: "Choose between different conversation styles based on your current needs."
+    title: "Two Ways to Talk",
+    description: "Pick **Vent** to dump the day or **Reflect** to untangle it. Switch anytime with one tap."
   },
   {
     icon: <Shield className="h-8 w-8 text-clarly-500" />,
     title: "Private & Secure",
-    description: "Your conversations are private and protected with industry-standard encryption."
+    description: "Your conversations stay between you and Clari. We only ask for your email to keep your account safe, and we never sell or share your data—ever."
   },
   {
     icon: <Sparkles className="h-8 w-8 text-clarly-500" />,
-    title: "Continuous Improvement",
-    description: "Our AI evolves to provide better emotional support with every conversation."
+    title: "Learns *You*, Never Shares",
+    description: "Clari adapts to your tone and patterns (not your identity) to mirror you better with every session."
   },
   {
     icon: <Zap className="h-8 w-8 text-clarly-500" />,
-    title: "Unlimited Access",
-    description: "Subscribe for unlimited conversations whenever you need support."
+    title: "Unlimited Relief",
+    description: "Chat as often as you like—less than one lunch, and thousands less than weekly therapy."
   }
 ];
 
@@ -39,9 +39,9 @@ const FeaturesSection = () => {
   return (
     <section className="py-16 bg-gradient-to-b from-white to-muted/30 rounded-xl">
       <div className="container">
-        <h2 className="text-3xl font-bold text-center mb-4">How HelloClarly Helps</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">How Clari Lightens the Load</h2>
         <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-          Our AI-powered emotional support companion is designed to be there for you
+          Six ways our always‑on AI confidant turns work‑day overwhelm into calm clarity.
         </p>
         
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
