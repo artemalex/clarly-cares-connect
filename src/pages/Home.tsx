@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Heart, Clock, Zap, Sparkles, MessageSquare, Brain, Shield, ArrowRight, Check, Star } from "lucide-react";
 import { useChatContext, MessageMode } from "@/contexts/chat";
+import StickyCTA from "@/components/ui/sticky-cta";
+
 const Home = () => {
   const {
     setMode
@@ -217,6 +218,9 @@ const Home = () => {
           </Button>
         </div>
       </section>
+      
+      {/* Sticky CTA that appears after scrolling */}
+      <StickyCTA text="Start for Free" linkTo="/signup" scrollThreshold={25} />
     </div>;
 };
 export default Home;
