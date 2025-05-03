@@ -16,7 +16,7 @@ const testimonials = [{
 const TestimonialsSection = () => {
   return <section className="py-16 bg-background">
       <div className="container">
-        <h2 className="text-3xl font-bold text-center mb-12">What People Are Saying</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">Hear It From HelloClari Users</h2>
         
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {testimonials.map((testimonial, i) => <Card key={i} className="bg-white border shadow-sm">
