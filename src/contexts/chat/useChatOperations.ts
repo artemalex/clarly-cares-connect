@@ -3,12 +3,8 @@ import { useEffect } from "react";
 import { useSubscriptionStatus } from "./hooks/useSubscriptionStatus";
 import { useConversationManagement } from "./hooks/useConversationManagement";
 import { useMessageHandling } from "./hooks/useMessageHandling";
-import { useGuestUser } from "@/hooks/useGuestUser";
 
 export function useChatOperations() {
-  // Initialize guest user functionality
-  const { guestId, isGuest, isLoading: guestLoading, migrateGuestData } = useGuestUser();
-  
   const {
     messagesUsed,
     remainingMessages,
@@ -16,7 +12,7 @@ export function useChatOperations() {
     isSubscribed,
     setMessagesUsed,
     checkSubscriptionStatus
-  } = useSubscriptionStatus(guestId);
+  } = useSubscriptionStatus();
   
   const {
     messages,
@@ -31,7 +27,7 @@ export function useChatOperations() {
     loadConversationData,
     startNewChat,
     generateFirstMessage
-  } = useConversationManagement(guestId);
+  } = useConversationManagement();
   
   const { sendMessage } = useMessageHandling(
     messages,
@@ -45,16 +41,12 @@ export function useChatOperations() {
     conversationId,
     setMessagesUsed,
     checkSubscriptionStatus,
-    startNewChat,
-    guestId
+    startNewChat
   );
 
   // Check subscription status and load conversation if ID is provided
   useEffect(() => {
     const initializeChat = async () => {
-      // Don't initialize until guest status is determined
-      if (guestLoading) return;
-      
       await checkSubscriptionStatus();
       
       if (urlConversationId) {
@@ -65,7 +57,7 @@ export function useChatOperations() {
     };
     
     initializeChat();
-  }, [urlConversationId, guestLoading]);
+  }, [urlConversationId]);
 
   return {
     messages,
@@ -75,9 +67,6 @@ export function useChatOperations() {
     isLoading,
     isSubscribed,
     conversationId,
-    isGuest,
-    guestId,
-    migrateGuestData,
     setMode,
     sendMessage,
     startNewChat,

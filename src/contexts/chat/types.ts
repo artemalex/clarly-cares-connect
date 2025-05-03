@@ -17,12 +17,9 @@ export interface ChatContextType {
   remainingMessages: number;
   isLoading: boolean;
   isSubscribed: boolean;
-  isGuest: boolean;
-  guestId: string | null;
   conversationId: string | null;
   setMode: (mode: MessageMode) => void;
   sendMessage: (content: string) => void;
   startNewChat: () => void;
-  migrateGuestData: () => Promise<boolean>;
   checkSubscriptionStatus: () => Promise<void>;
 }

@@ -14,7 +14,7 @@ interface PaywallModalProps {
 }
 
 const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
-  const { remainingMessages, isSubscribed, isGuest, guestId } = useChatContext();
+  const { remainingMessages, isSubscribed } = useChatContext();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -26,14 +26,9 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
       const { data: sessionData } = await supabase.auth.getSession();
       
       if (!sessionData.session) {
-        // Redirect to login if not logged in, pass guest ID as query param if available
-        let redirectUrl = "/login?redirect=subscribe";
-        if (guestId) {
-          redirectUrl += `&guest_id=${encodeURIComponent(guestId)}`;
-        }
-        
+        // Redirect to login if not logged in
         toast.info("Please sign in to subscribe.");
-        navigate(redirectUrl);
+        navigate("/login?redirect=subscribe");
         onClose();
         return;
       }
@@ -87,7 +82,7 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
           </DialogTitle>
           <DialogDescription className="text-center pt-2">
             {remainingMessages <= 0 
-              ? `You've used all your ${isGuest ? "guest" : "free"} messages.` 
+              ? "You've used all your free messages for today." 
               : "Get unlimited access to HelloClarly"}
           </DialogDescription>
         </DialogHeader>
@@ -95,15 +90,14 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
         <div className="grid gap-4 py-4">
           <div className="rounded-lg border p-4 bg-muted/30">
             <h3 className="font-medium text-lg mb-2">Premium Plan</h3>
-            <p className="text-2xl font-bold mb-4">€10<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+            <p className="text-2xl font-bold mb-4">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
             
             <ul className="space-y-2">
               {[
-                "Unlimited emotional support",
-                "Deep personalization",
-                "Advanced emotional pattern recognition",
-                "Priority response times",
-                "Safe, private, and judgment-free space"
+                "3,000 messages per month",
+                "Priority support",
+                "Save conversation history",
+                "Access to all conversation modes"
               ].map((feature, i) => (
                 <li key={i} className="flex items-center">
                   <CheckCircle className="h-4 w-4 text-secondary mr-2" />

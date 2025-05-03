@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
 import { loadConversation, createConversation, generateInitialMessage } from "../utils/conversationUtils";
 
-export function useConversationManagement(guestId: string | null = null) {
+export function useConversationManagement() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [mode, setMode] = useState<MessageMode>(() => {
     const savedMode = localStorage.getItem("clarlyMode");
@@ -72,8 +72,8 @@ export function useConversationManagement(guestId: string | null = null) {
       const session = await supabase.auth.getSession();
       const userId = session.data.session?.user?.id;
       
-      // Create a new conversation - handle both authenticated and guest users
-      const result = await createConversation(mode, userId, guestId);
+      // Create a new conversation
+      const result = await createConversation(mode, userId);
       if (!result.success) return;
       
       // Update state with the new conversation ID
@@ -101,11 +101,7 @@ export function useConversationManagement(guestId: string | null = null) {
     
     setIsLoading(true);
     try {
-      // Get user information
-      const session = await supabase.auth.getSession();
-      const userId = session.data.session?.user?.id;
-      
-      const result = await generateInitialMessage(newConversationId, mode, userId, guestId);
+      const result = await generateInitialMessage(newConversationId, mode);
       
       if (!result.success) {
         toast.error("Failed to start the conversation. Please try again.");

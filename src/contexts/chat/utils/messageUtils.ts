@@ -8,8 +8,7 @@ export async function sendMessageToAPI(
   content: string, 
   messages: Message[], 
   mode: MessageMode,
-  conversationId: string,
-  guestId: string | null = null
+  conversationId: string
 ) {
   try {
     // Create user message object for local state
@@ -25,7 +24,7 @@ export async function sendMessageToAPI(
     const session = await supabase.auth.getSession();
     const userId = session.data.session?.user?.id;
     
-    // Save user message to database - handle both authenticated and guest users
+    // Save user message to database if logged in
     if (userId) {
       await supabase.from('chat_messages').insert({
         id: messageId,
@@ -34,28 +33,6 @@ export async function sendMessageToAPI(
         content,
         user_id: userId
       });
-    } else if (guestId) {
-      await supabase.from('chat_messages').insert({
-        id: messageId,
-        conversation_id: conversationId,
-        role: 'user',
-        content,
-        guest_id: guestId
-      });
-      
-      // Increment message count for guest users
-      const { data: limitsData, error: limitsError } = await supabase
-        .from('user_limits')
-        .select('messages_used')
-        .eq('guest_id', guestId)
-        .maybeSingle();
-      
-      if (!limitsError && limitsData) {
-        await supabase
-          .from('user_limits')
-          .update({ messages_used: limitsData.messages_used + 1 })
-          .eq('guest_id', guestId);
-      }
     }
     
     // Prepare messages for the OpenAI API
@@ -75,7 +52,7 @@ export async function sendMessageToAPI(
     
     const assistantMessageId = uuidv4();
     
-    // Save AI response to database - handle both authenticated and guest users
+    // Save AI response to database if logged in
     if (userId) {
       await supabase.from('chat_messages').insert({
         id: assistantMessageId,
@@ -83,14 +60,6 @@ export async function sendMessageToAPI(
         role: 'assistant',
         content: data.message,
         user_id: userId
-      });
-    } else if (guestId) {
-      await supabase.from('chat_messages').insert({
-        id: assistantMessageId,
-        conversation_id: conversationId,
-        role: 'assistant',
-        content: data.message,
-        guest_id: guestId
       });
     }
     
