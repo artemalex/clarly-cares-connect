@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessageMode } from "@/contexts/chat/constants";
+import { cn } from "@/lib/utils";
 
 const Chat = () => {
   const { remainingMessages, startNewChat, messages, setMode } = useChatContext();
@@ -67,11 +68,22 @@ const Chat = () => {
   return (
     <div 
       ref={pageRef}
-      className="container py-4 sm:py-6 px-2 sm:px-4 flex flex-col mobile-chat-page"
+      className={cn(
+        "container py-4 sm:py-6 px-2 sm:px-4 flex flex-col mobile-chat-page",
+        isMobile && "pb-16" // Add padding at bottom for mobile to prevent footer overlap
+      )}
     >
       <div className="max-w-4xl mx-auto w-full flex flex-col flex-grow">
-        <div className="flex justify-between items-center mb-3 sm:mb-5 sticky-header">
-          <h1 className="text-xl sm:text-2xl font-bold">Chat with HelloClarly</h1>
+        <div className={cn(
+          "flex justify-between items-center mb-3 sm:mb-5 transition-all duration-300",
+          isMobile && "sticky-header"
+        )}>
+          <h1 className={cn(
+            "font-bold transition-all",
+            isScrolled ? "text-lg" : "text-xl sm:text-2xl"
+          )}>
+            Chat with HelloClarly
+          </h1>
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
