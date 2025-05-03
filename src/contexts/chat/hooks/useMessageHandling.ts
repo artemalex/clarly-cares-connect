@@ -17,7 +17,8 @@ export function useMessageHandling(
   conversationId: string | null,
   setMessagesUsed: React.Dispatch<React.SetStateAction<number>>,
   checkSubscriptionStatus: () => Promise<void>,
-  startNewChat: () => Promise<void>
+  startNewChat: () => Promise<void>,
+  guestId: string | null = null
 ) {
   // Send a message and get a response
   const sendMessage = async (content: string) => {
@@ -48,7 +49,7 @@ export function useMessageHandling(
     
     try {
       // Send message and get response
-      const result = await sendMessageToAPI(content, messages, mode, activeConversationId);
+      const result = await sendMessageToAPI(content, messages, mode, activeConversationId, guestId);
       
       if (!result.success) {
         toast.error("Failed to get a response. Please try again.");
@@ -62,11 +63,11 @@ export function useMessageHandling(
       const session = await supabase.auth.getSession();
       const userId = session.data.session?.user?.id;
       
-      // Increment message count for guest users - only for user messages
-      if (!userId) {
+      if (!userId && !guestId) {
+        // Increment message count for local-only users - only for user messages
         setMessagesUsed(prev => prev + 1);
       } else {
-        // Reload message usage count if user is logged in
+        // Reload message usage count if user is logged in or is a guest user
         await checkSubscriptionStatus();
       }
       

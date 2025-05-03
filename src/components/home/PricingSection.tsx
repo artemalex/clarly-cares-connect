@@ -1,32 +1,34 @@
+
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+
 const PricingSection = () => {
   return <section className="py-16 bg-gradient-to-b from-white to-muted/30">
       <div className="container">
         <h2 className="text-3xl font-bold text-center mb-4">One Flat Price, Unlimited Support</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">Unlimited 24/7 HelloClari chats —cheaper than a lunch, priceless for peace of mind.</p>
+        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">Start with no sign-up required — try HelloClari for free, then upgrade for unlimited support.</p>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {/* Free Tier */}
           <Card className="border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-2xl">Free Trial</CardTitle>
-              <CardDescription>Try HelloClari with no commitment</CardDescription>
+              <CardTitle className="text-2xl">No Sign-up Needed</CardTitle>
+              <CardDescription>Start chatting immediately</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
                 <p className="text-4xl font-bold">€0<span className="text-lg text-muted-foreground font-normal">/forever</span></p>
               </div>
               <ul className="space-y-3">
-                {["3 free emotional support sessions", "Basic personalization", "Text-based chat interface"].map((feature, i) => <li key={i} className="flex items-start">
+                {["6 free emotional support chats", "No account required", "Private and anonymous", "Text-based chat interface"].map((feature, i) => <li key={i} className="flex items-start">
                     <Check className="h-5 w-5 text-clarly-500 mr-2 shrink-0 mt-0.5" />
                     <span>{feature}</span>
                   </li>)}
               </ul>
               <Button className="w-full mt-8" size="lg" variant="outline" asChild>
-                <Link to="/signup">Start Free Trial</Link>
+                <Link to="/chat">Start Chatting Now</Link>
               </Button>
             </CardContent>
           </Card>
@@ -59,4 +61,5 @@ const PricingSection = () => {
       </div>
     </section>;
 };
+
 export default PricingSection;
