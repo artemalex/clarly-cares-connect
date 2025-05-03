@@ -1,23 +1,23 @@
+export type MessageRole = "user" | "assistant";
 
-import { MessageMode } from "./constants";
+// Add the MessageMode type definition
+export type MessageMode = "slow" | "vent";
 
 export interface Message {
   id: string;
-  role: "user" | "assistant" | "system";
   content: string;
+  role: MessageRole;
   timestamp: Date;
 }
 
 export interface ChatContextType {
   messages: Message[];
-  mode: MessageMode;
-  messagesUsed: number;
-  remainingMessages: number;
+  addMessage: (message: Message) => void;
   isLoading: boolean;
-  isSubscribed: boolean;
-  conversationId: string | null;
-  setMode: (mode: MessageMode) => void;
   sendMessage: (content: string) => void;
+  mode: MessageMode;
+  setMode: (mode: MessageMode) => void;
   startNewChat: () => void;
-  checkSubscriptionStatus: () => Promise<void>;
+  remainingMessages: number;
+  isSubscribed: boolean;
 }
