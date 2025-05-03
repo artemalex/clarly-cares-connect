@@ -1,4 +1,6 @@
-import { useChatContext, MessageMode } from "@/contexts/chat";
+
+import { useChatContext } from "@/contexts/chat";
+import { MessageMode } from "@/contexts/chat";
 import { Button } from "@/components/ui/button";
 import { Clock, Zap, AudioWaveform } from "lucide-react";
 import { supabase } from "@/lib/supabase";

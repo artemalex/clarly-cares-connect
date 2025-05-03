@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from "@/lib/supabase";
@@ -19,9 +18,27 @@ export function useChatOperations() {
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   
-  const { id: urlConversationId } = useParams<{ id?: string }>();
-  const navigate = useNavigate();
-
+  // Get router hooks conditionally using try/catch to prevent errors if used outside Router
+  const params = (() => {
+    try {
+      return useParams<{ id?: string }>();
+    } catch (e) {
+      return { id: undefined };
+    }
+  })();
+  
+  const urlConversationId = params.id;
+  
+  const navigate = (() => {
+    try {
+      return useNavigate();
+    } catch (e) {
+      return (path: string) => {
+        console.warn("Navigation attempted outside Router context:", path);
+      };
+    }
+  })();
+  
   // Calculate remaining messages
   const remainingMessages = messagesLimit - messagesUsed;
 
