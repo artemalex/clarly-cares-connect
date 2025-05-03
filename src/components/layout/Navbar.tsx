@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Heart, LogOut, History, User } from "lucide-react";
@@ -48,7 +49,7 @@ const Navbar = () => {
         </Link>
         <div className="flex items-center space-x-4">
           <Button variant="ghost" asChild>
-            <Link to="/chat" className="">Chat History</Link>
+            <Link to="/history" className="">Chat History</Link>
           </Button>
           
           {user ? <DropdownMenu>
