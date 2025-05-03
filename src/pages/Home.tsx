@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,8 +23,12 @@ const Home = () => {
     navigate("/chat");
   };
   
+  // Modified to prevent double popup opening
   const handleOpenModeSelector = () => {
-    setModeSelectorOpen(true);
+    // Only open if it's not already open
+    if (!modeSelectorOpen) {
+      setModeSelectorOpen(true);
+    }
   };
   
   const handleSelectMode = (mode: MessageMode) => {
