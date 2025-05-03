@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -272,7 +273,7 @@ export function useChatOperations() {
         .filter(msg => msg.role !== "system") // Filter out any previous system messages
         .map(({ role, content }) => ({ role, content }));
       
-      // Add the system prompt at the beginning
+      // Add the system prompt at the beginning based on selected mode
       messageHistory.unshift({ role: "system", content: SYSTEM_PROMPTS[mode] });
       
       // Call the OpenAI API via Supabase Edge Function
