@@ -113,7 +113,7 @@
   }
 
   .assistant-message {
-    @apply bg-support-100 text-support-900 mr-auto;
+    @apply bg-white text-foreground mr-auto;
   }
   
   /* Mobile chat layout enhancements */
