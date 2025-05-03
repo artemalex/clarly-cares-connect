@@ -61,9 +61,9 @@ const ChatInput = () => {
     <form 
       onSubmit={handleSubmit} 
       className={cn(
-        "p-2 sm:p-3 border-t bg-card rounded-b-xl transition-all",
-        isFocused ? "pb-3" : "pb-2",
-        isMobile && "sticky-input"
+        "p-2 sm:p-3 border-t bg-card sticky bottom-0 z-10",
+        "rounded-b-xl transition-all",
+        isFocused ? "pb-3" : "pb-2"
       )}
     >
       <div className="flex flex-col space-y-2">

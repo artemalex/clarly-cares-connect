@@ -7,13 +7,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface MessageListProps {
+  className?: string;
   onScroll?: (isScrolled: boolean) => void;
 }
 
-const MessageList = ({ onScroll }: MessageListProps) => {
+const MessageList = ({ className, onScroll }: MessageListProps) => {
   const { messages, isLoading } = useChatContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,7 +86,10 @@ const MessageList = ({ onScroll }: MessageListProps) => {
   return (
     <div 
       ref={containerRef} 
-      className="p-2 sm:p-3 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400"
+      className={cn(
+        "p-2 sm:p-3 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400",
+        className
+      )}
     >
       {messages.length === 0 ? (
         <div className="flex items-center justify-center min-h-[200px] sm:min-h-[400px]">
