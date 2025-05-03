@@ -5,7 +5,7 @@ interface GTMProps {
   id?: string;
 }
 
-const GTM = ({ id = "GTM-XXXXXXX" }: GTMProps) => {
+const GTM = ({ id = "GTM-PSB76CLL" }: GTMProps) => {
   // Don't render anything if GTM ID is not provided or is the placeholder
   if (!id || id === "GTM-XXXXXXX") return null;
 
