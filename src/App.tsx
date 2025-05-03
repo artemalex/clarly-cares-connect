@@ -13,7 +13,7 @@ import NotFound from "./pages/NotFound";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
-import { ChatProvider } from "./contexts/ChatContext";
+import { ChatProvider } from "./contexts/chat";
 
 const queryClient = new QueryClient();
 

@@ -1,5 +1,5 @@
 
-import { Message } from "@/contexts/ChatContext";
+import { Message } from "@/contexts/chat";
 import { cn } from "@/lib/utils";
 
 interface MessageBubbleProps {

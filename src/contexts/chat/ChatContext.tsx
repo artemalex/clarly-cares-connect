@@ -3,8 +3,10 @@ import { createContext, useContext, ReactNode } from "react";
 import { ChatContextType } from "./types";
 import { useChatOperations } from "./useChatOperations";
 
+// Create the context
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
+// Hook to use the chat context
 export const useChatContext = () => {
   const context = useContext(ChatContext);
   if (!context) {
@@ -13,38 +15,18 @@ export const useChatContext = () => {
   return context;
 };
 
+// Props for the chat provider
 interface ChatProviderProps {
   children: ReactNode;
 }
 
+// Chat provider component
 export const ChatProvider = ({ children }: ChatProviderProps) => {
-  const {
-    messages,
-    mode,
-    messagesUsed,
-    remainingMessages,
-    isLoading,
-    isSubscribed,
-    conversationId,
-    setMode,
-    sendMessage,
-    startNewChat,
-    checkSubscriptionStatus
-  } = useChatOperations();
+  const chatOperations = useChatOperations();
 
-  const value: ChatContextType = {
-    messages,
-    mode,
-    messagesUsed,
-    remainingMessages,
-    isLoading,
-    isSubscribed,
-    conversationId,
-    setMode,
-    sendMessage,
-    startNewChat,
-    checkSubscriptionStatus
-  };
-
-  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
+  return (
+    <ChatContext.Provider value={chatOperations}>
+      {children}
+    </ChatContext.Provider>
+  );
 };
