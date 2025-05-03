@@ -1,7 +1,6 @@
 
 import { Message } from "@/contexts/chat";
 import { cn } from "@/lib/utils";
-import SuggestionButtons from "./SuggestionButtons";
 
 interface MessageBubbleProps {
   message: Message;
@@ -25,9 +24,6 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
         isUser ? "user-message rounded-tr-none" : "assistant-message rounded-tl-none"
       )}>
         <p className="whitespace-pre-wrap">{message.content}</p>
-        {!isUser && message.suggestions && (
-          <SuggestionButtons suggestions={message.suggestions} />
-        )}
       </div>
       <span className="text-xs text-muted-foreground px-2">
         {isUser ? "You" : "Assistant"} • {formattedTime}

@@ -6,7 +6,6 @@ export interface Message {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: Date;
-  suggestions?: string[];
 }
 
 export interface ChatContextType {

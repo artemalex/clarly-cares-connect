@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -154,8 +153,7 @@ export function useChatOperations() {
         id: msg.id,
         role: msg.role as "user" | "assistant" | "system",
         content: msg.content,
-        timestamp: new Date(msg.created_at),
-        suggestions: msg.suggestions ? JSON.parse(msg.suggestions) : undefined
+        timestamp: new Date(msg.created_at)
       }));
       
       setMessages(formattedMessages);
@@ -183,7 +181,6 @@ export function useChatOperations() {
       if (error) throw error;
       
       const messageId = uuidv4();
-      const suggestions = data.suggestions || [];
       
       // For logged in users, store message in database
       const session = await supabase.auth.getSession();
@@ -193,7 +190,6 @@ export function useChatOperations() {
           conversation_id: newConversationId,
           role: 'assistant',
           content: data.message,
-          suggestions: JSON.stringify(suggestions),
           user_id: session.data.session.user.id
         });
       }
@@ -202,8 +198,7 @@ export function useChatOperations() {
         id: messageId,
         role: "assistant",
         content: data.message,
-        timestamp: new Date(),
-        suggestions: suggestions
+        timestamp: new Date()
       };
       
       setMessages([assistantMessage]);
@@ -287,7 +282,6 @@ export function useChatOperations() {
       if (error) throw error;
       
       const assistantMessageId = uuidv4();
-      const suggestions = data.suggestions || [];
       
       // Save AI response to database if logged in
       if (userId) {
@@ -296,7 +290,6 @@ export function useChatOperations() {
           conversation_id: activeConversationId,
           role: 'assistant',
           content: data.message,
-          suggestions: JSON.stringify(suggestions),
           user_id: userId
         });
       } else {
@@ -308,8 +301,7 @@ export function useChatOperations() {
         id: assistantMessageId,
         role: "assistant",
         content: data.message,
-        timestamp: new Date(),
-        suggestions: suggestions
+        timestamp: new Date()
       };
       
       // Update local state with AI response
