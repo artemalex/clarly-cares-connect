@@ -20,6 +20,8 @@ const MessageList = ({ className, onScroll }: MessageListProps) => {
   const isMobile = useIsMobile();
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const allowAutoScrollRef = useRef(true);
+  const lastUserMessageRef = useRef<HTMLDivElement>(null);
 
   // Check if user has scrolled up
   const handleScroll = () => {
@@ -37,30 +39,41 @@ const MessageList = ({ className, onScroll }: MessageListProps) => {
     
     if (isAtBottom) {
       setIsUserScrolling(false);
+      allowAutoScrollRef.current = true;
     }
   };
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll behavior depending on who sent the last message
   useEffect(() => {
-    const scrollToBottom = () => {
-      if (messagesEndRef.current && !isUserScrolling) {
-        messagesEndRef.current.scrollIntoView({ 
-          behavior: "smooth",
-          block: "end" 
-        });
+    if (messages.length === 0) return;
+    
+    const lastMessage = messages[messages.length - 1];
+    
+    // If the last message is from the user, center it and disable auto-scrolling for assistant replies
+    if (lastMessage.role === 'user') {
+      allowAutoScrollRef.current = false; // Lock scrolling until next user message
+      
+      // Find the last user message element
+      const userMessages = document.querySelectorAll(`[data-role="user"][data-id="${lastMessage.id}"]`);
+      if (userMessages.length > 0) {
+        const lastUserMessage = userMessages[userMessages.length - 1];
+        lastUserMessage.scrollIntoView({ behavior: "smooth", block: "center" });
       }
-    };
-    
-    scrollToBottom();
-    
-    // Add smooth scroll behavior after a small delay
-    const timeoutId = setTimeout(scrollToBottom, 100);
-    return () => clearTimeout(timeoutId);
-  }, [messages, isUserScrolling]);
+    }
+    // If autoScroll is true and message is from assistant, scroll to it
+    else if (lastMessage.role === 'assistant' && allowAutoScrollRef.current) {
+      const assistantMessages = document.querySelectorAll(`[data-role="assistant"][data-id="${lastMessage.id}"]`);
+      if (assistantMessages.length > 0) {
+        const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
+        lastAssistantMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+  }, [messages]);
 
   // Handle scroll button click
   const handleScrollToBottom = () => {
     if (messagesEndRef.current) {
+      allowAutoScrollRef.current = true; // Re-enable auto-scrolling
       setIsUserScrolling(false);
       messagesEndRef.current.scrollIntoView({ 
         behavior: "smooth",
@@ -100,7 +113,10 @@ const MessageList = ({ className, onScroll }: MessageListProps) => {
       ) : (
         <div className="space-y-6 pb-4">
           {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+            <MessageBubble 
+              key={message.id} 
+              message={message} 
+            />
           ))}
           {isLoading && (
             <div className="flex items-center space-x-2 animate-fade-in">

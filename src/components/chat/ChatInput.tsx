@@ -28,6 +28,7 @@ const ChatInput = () => {
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (message.trim()) {
+      // Allow scrolling for this user message
       sendMessage(message);
       setMessage("");
       setIsFocused(false);
