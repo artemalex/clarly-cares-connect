@@ -34,45 +34,13 @@ const ChatModeSelector = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center">Choose Your Support Style</DialogTitle>
+          <DialogTitle className="text-center">Choose the conversation mode that fits today</DialogTitle>
           <DialogDescription className="text-center">
-            Select the conversation style that best fits your current needs
+            No pressure. Just the kind of space you need.
           </DialogDescription>
         </DialogHeader>
         
         <div className="flex flex-col gap-4 py-4">
-          <button
-            onClick={() => setSelectedMode("slow")}
-            className={cn(
-              "flex items-start gap-3 p-4 rounded-lg border transition-all",
-              selectedMode === "slow" 
-                ? "border-primary bg-primary/5" 
-                : "border-border hover:border-primary/50"
-            )}
-          >
-            <div className={cn(
-              "mt-1 p-2 rounded-full",
-              selectedMode === "slow" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-            )}>
-              <Clock className="h-5 w-5" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-medium">Slow Down Mode</h3>
-              <p className="text-sm text-muted-foreground">
-                Thoughtful conversations to help you process and reflect
-              </p>
-              
-              <div className="mt-2">
-                <p className="text-xs font-medium">Perfect when you need to:</p>
-                <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
-                  <li>Process complex emotions at your own pace</li>
-                  <li>Work through a difficult decision mindfully</li>
-                  <li>Find clarity in challenging situations</li>
-                </ul>
-              </div>
-            </div>
-          </button>
-          
           <button
             onClick={() => setSelectedMode("vent")}
             className={cn(
@@ -89,17 +57,47 @@ const ChatModeSelector = ({
               <Zap className="h-5 w-5" />
             </div>
             <div className="text-left">
-              <h3 className="font-medium">Vent Mode</h3>
+              <h3 className="font-medium">🔥 Vent Mode</h3>
               <p className="text-sm text-muted-foreground">
-                Quick emotional release when you just need to be heard
+                Say it all. No filters, no fixing.
               </p>
               
               <div className="mt-2">
-                <p className="text-xs font-medium">Perfect when you need to:</p>
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
-                  <li>Quickly release built-up emotions</li>
-                  <li>Get something off your chest without judgment</li>
-                  <li>Feel validated without receiving advice</li>
+                  <li>Get things off your chest fast</li>
+                  <li>Speak freely without judgment</li>
+                  <li>Feel heard — not analyzed</li>
+                </ul>
+              </div>
+            </div>
+          </button>
+          
+          <button
+            onClick={() => setSelectedMode("slow")}
+            className={cn(
+              "flex items-start gap-3 p-4 rounded-lg border transition-all",
+              selectedMode === "slow" 
+                ? "border-primary bg-primary/5" 
+                : "border-border hover:border-primary/50"
+            )}
+          >
+            <div className={cn(
+              "mt-1 p-2 rounded-full",
+              selectedMode === "slow" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+            )}>
+              <Clock className="h-5 w-5" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-medium">🧠 Reflect Mode</h3>
+              <p className="text-sm text-muted-foreground">
+                Slow down. Think it through.
+              </p>
+              
+              <div className="mt-2">
+                <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
+                  <li>Untangle mixed emotions</li>
+                  <li>Make sense of a tough moment</li>
+                  <li>Talk it out at your own pace</li>
                 </ul>
               </div>
             </div>
@@ -108,7 +106,7 @@ const ChatModeSelector = ({
         
         <div className="flex justify-end">
           <Button onClick={handleConfirm}>
-            Continue with {selectedMode === "slow" ? "Slow Down" : "Vent"} Mode
+            Continue with {selectedMode === "slow" ? "Reflect" : "Vent"} Mode
           </Button>
         </div>
       </DialogContent>
