@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { useChatContext } from "@/contexts/chat";
 import MessageBubble from "./MessageBubble";
@@ -48,6 +47,8 @@ const MessageList = ({ className, onScroll }: MessageListProps) => {
     if (messages.length === 0) return;
     
     const lastMessage = messages[messages.length - 1];
+    const lastUserMessageIndex = [...messages].reverse().findIndex(m => m.role === 'user');
+    const lastUserMessage = lastUserMessageIndex >= 0 ? messages[messages.length - 1 - lastUserMessageIndex] : null;
     
     // If the last message is from the user, center it and disable auto-scrolling for assistant replies
     if (lastMessage.role === 'user') {
@@ -57,15 +58,15 @@ const MessageList = ({ className, onScroll }: MessageListProps) => {
       const userMessages = document.querySelectorAll(`[data-role="user"][data-id="${lastMessage.id}"]`);
       if (userMessages.length > 0) {
         const lastUserMessage = userMessages[userMessages.length - 1];
-        lastUserMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+        lastUserMessage.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
-    // If autoScroll is true and message is from assistant, scroll to it
-    else if (lastMessage.role === 'assistant' && allowAutoScrollRef.current) {
-      const assistantMessages = document.querySelectorAll(`[data-role="assistant"][data-id="${lastMessage.id}"]`);
-      if (assistantMessages.length > 0) {
-        const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
-        lastAssistantMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // If the last message is from assistant, scroll to keep the last user message at the top
+    else if (lastMessage.role === 'assistant' && lastUserMessage) {
+      const userMessages = document.querySelectorAll(`[data-role="user"][data-id="${lastUserMessage.id}"]`);
+      if (userMessages.length > 0) {
+        const lastUserMessageElement = userMessages[userMessages.length - 1];
+        lastUserMessageElement.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
   }, [messages]);
