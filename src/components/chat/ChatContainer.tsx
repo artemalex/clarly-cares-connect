@@ -6,6 +6,7 @@ import ChatInput from "./ChatInput";
 import ChatModeSelector from "./ChatModeSelector";
 import { useChatContext } from "@/contexts/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MessageMode } from "@/contexts/chat/constants";
 
 const ChatContainer = () => {
   const { isLoading, setMode, startNewChat, messages } = useChatContext();
@@ -13,7 +14,7 @@ const ChatContainer = () => {
   const [showModeSelector, setShowModeSelector] = useState(messages.length === 0);
   const isMobile = useIsMobile();
 
-  const handleSelectMode = (mode: typeof import('@/contexts/chat').MessageMode) => {
+  const handleSelectMode = (mode: MessageMode) => {
     setMode(mode);
     setShowModeSelector(false);
     startNewChat();

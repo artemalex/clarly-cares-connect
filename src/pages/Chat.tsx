@@ -8,6 +8,7 @@ import { useChatContext } from "@/contexts/chat";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { MessageMode } from "@/contexts/chat/constants";
 
 const Chat = () => {
   const { remainingMessages, startNewChat, messages, setMode } = useChatContext();
@@ -57,7 +58,7 @@ const Chat = () => {
     setModeSelectorOpen(true);
   };
 
-  const handleSelectMode = (mode: typeof import('@/contexts/chat').MessageMode) => {
+  const handleSelectMode = (mode: MessageMode) => {
     setMode(mode);
     setModeSelectorOpen(false);
     startNewChat();

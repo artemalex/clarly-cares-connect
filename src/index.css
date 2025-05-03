@@ -7,33 +7,33 @@
 
 @layer base {
   :root {
-    --background: 195 30% 98%;
-    --foreground: 195 50% 12%;
+    --background: 260 20% 98%;
+    --foreground: 260 22% 22%;
 
     --card: 0 0% 100%;
-    --card-foreground: 195 50% 12%;
+    --card-foreground: 260 22% 22%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 195 50% 12%;
+    --popover-foreground: 260 22% 22%;
 
-    --primary: 195 78% 43%;
+    --primary: 260 30% 54%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 145 53% 42%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 20 25% 92%;
+    --secondary-foreground: 260 22% 22%;
 
-    --muted: 195 15% 94%;
-    --muted-foreground: 195 20% 45%;
+    --muted: 260 10% 94%;
+    --muted-foreground: 260 10% 45%;
 
-    --accent: 145 35% 90%;
-    --accent-foreground: 145 63% 25%;
+    --accent: 150 15% 76%;
+    --accent-foreground: 150 30% 22%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 195 15% 90%;
-    --input: 195 15% 90%;
-    --ring: 195 78% 43%;
+    --border: 260 15% 90%;
+    --input: 260 15% 90%;
+    --ring: 260 30% 54%;
 
     --radius: 0.75rem;
 
@@ -48,33 +48,33 @@
   }
 
   .dark {
-    --background: 195 50% 8%;
-    --foreground: 195 15% 95%;
+    --background: 260 25% 10%;
+    --foreground: 260 15% 95%;
 
-    --card: 195 50% 10%;
-    --card-foreground: 195 15% 95%;
+    --card: 260 25% 12%;
+    --card-foreground: 260 15% 95%;
 
-    --popover: 195 50% 10%;
-    --popover-foreground: 195 15% 95%;
+    --popover: 260 25% 12%;
+    --popover-foreground: 260 15% 95%;
 
-    --primary: 195 70% 50%;
+    --primary: 260 30% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 145 50% 40%;
+    --secondary: 20 15% 18%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 195 25% 20%;
-    --muted-foreground: 195 15% 65%;
+    --muted: 260 25% 20%;
+    --muted-foreground: 260 15% 65%;
 
-    --accent: 145 30% 20%;
-    --accent-foreground: 145 70% 85%;
+    --accent: 150 20% 25%;
+    --accent-foreground: 150 70% 85%;
 
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 195 25% 20%;
-    --input: 195 25% 20%;
-    --ring: 195 70% 50%;
+    --border: 260 25% 20%;
+    --input: 260 25% 20%;
+    --ring: 260 30% 60%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -109,11 +109,11 @@
   }
 
   .user-message {
-    @apply bg-clarly-100 text-clarly-950 ml-auto;
+    @apply bg-empath-100 text-empath-900 ml-auto;
   }
 
   .assistant-message {
-    @apply bg-support-100 text-support-950 mr-auto;
+    @apply bg-support-100 text-support-900 mr-auto;
   }
   
   /* Mobile chat layout enhancements */
