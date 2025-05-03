@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Heart, Clock, Zap, Sparkles, MessageSquare, Brain, Shield, ArrowRight } from "lucide-react";
+import { Heart, Clock, Zap, Sparkles, MessageSquare, Brain, Shield, ArrowRight, Check, Star } from "lucide-react";
 import { useChatContext, MessageMode } from "@/contexts/chat";
 const Home = () => {
   const {
@@ -39,72 +40,6 @@ const Home = () => {
                 </Button>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mode Selection Section */}
-      <section className="py-16 container">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Choose Your Support Style</h2>
-          <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Select the conversation style that best fits your current needs
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className={`cursor-pointer transition-all duration-300 hover:shadow-md ${selectedMode === "slow" ? "border-clarly-500 shadow-md" : ""} h-full`} onClick={() => setSelectedMode("slow")}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center">
-                    <Clock className="h-5 w-5 mr-2 text-clarly-500" />
-                    Slow Down Mode
-                  </CardTitle>
-                  {selectedMode === "slow" && <Sparkles className="h-5 w-5 text-clarly-500" />}
-                </div>
-                <CardDescription className="text-base">
-                  Thoughtful conversations to help you process and reflect
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="font-medium">Perfect when you need to:</p>
-                <ul className="list-disc list-inside mt-2 space-y-2 text-muted-foreground">
-                  <li>Process complex emotions at your own pace</li>
-                  <li>Work through a difficult decision mindfully</li>
-                  <li>Find clarity in challenging situations</li>
-                </ul>
-              </CardContent>
-            </Card>
-            
-            <Card className={`cursor-pointer transition-all duration-300 hover:shadow-md ${selectedMode === "vent" ? "border-clarly-500 shadow-md" : ""} h-full`} onClick={() => setSelectedMode("vent")}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center">
-                    <Zap className="h-5 w-5 mr-2 text-clarly-500" />
-                    Vent Mode
-                  </CardTitle>
-                  {selectedMode === "vent" && <Sparkles className="h-5 w-5 text-clarly-500" />}
-                </div>
-                <CardDescription className="text-base">
-                  Quick emotional release when you just need to be heard
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="font-medium">Perfect when you need to:</p>
-                <ul className="list-disc list-inside mt-2 space-y-2 text-muted-foreground">
-                  <li>Quickly release built-up emotions</li>
-                  <li>Get something off your chest without judgment</li>
-                  <li>Feel validated without receiving advice</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="flex justify-center mt-10">
-            <Button size="lg" className="px-6" asChild>
-              <Link to="/chat" onClick={() => handleStartChat(selectedMode)}>
-                Start Chatting in {selectedMode === "slow" ? "Slow Down" : "Vent"} Mode
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
@@ -151,6 +86,119 @@ const Home = () => {
                   <p className="text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>)}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 bg-background">
+        <div className="container">
+          <h2 className="text-3xl font-bold text-center mb-12">What People Are Saying</h2>
+          
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                quote: "EmpathAI gave me a safe place to process my emotions after difficult meetings. It's like having a pocket therapist who's always available.",
+                name: "Jamie",
+                role: "Product Manager"
+              },
+              {
+                quote: "When I felt invisible at work, EmpathAI helped me feel seen. It's the emotional support I didn't know I needed until I tried it.",
+                name: "Taylor",
+                role: "UX Designer"
+              },
+              {
+                quote: "Instead of bottling up my feelings or venting to colleagues, I can talk to EmpathAI. It's made a huge difference in my work relationships.",
+                name: "Alex",
+                role: "Team Lead"
+              }
+            ].map((testimonial, i) => (
+              <Card key={i} className="bg-white border shadow-sm">
+                <CardContent className="pt-6">
+                  <div className="flex mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="h-5 w-5 fill-clarly-500 text-clarly-500" />
+                    ))}
+                  </div>
+                  <p className="mb-6 italic text-muted-foreground">{testimonial.quote}</p>
+                  <div className="font-semibold">{testimonial.name}</div>
+                  <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-16 bg-gradient-to-b from-white to-muted/30">
+        <div className="container">
+          <h2 className="text-3xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
+          <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+            Less than the cost of lunch for your emotional well-being
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Free Tier */}
+            <Card className="border shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-2xl">Free Trial</CardTitle>
+                <CardDescription>Try EmpathAI with no commitment</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <p className="text-4xl font-bold">€0<span className="text-lg text-muted-foreground font-normal">/forever</span></p>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "3 free emotional support sessions",
+                    "Basic personalization",
+                    "Text-based chat interface"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start">
+                      <Check className="h-5 w-5 text-clarly-500 mr-2 shrink-0 mt-0.5" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button className="w-full mt-8" size="lg" variant="outline" asChild>
+                  <Link to="/signup">Start Free Trial</Link>
+                </Button>
+              </CardContent>
+            </Card>
+            
+            {/* Premium Tier */}
+            <Card className="border border-clarly-200 shadow-md relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-clarly-500 text-white px-4 py-1 text-sm font-medium">
+                Most Popular
+              </div>
+              <CardHeader>
+                <CardTitle className="text-2xl">Premium</CardTitle>
+                <CardDescription>Unlimited emotional support</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <p className="text-4xl font-bold">€10<span className="text-lg text-muted-foreground font-normal">/month</span></p>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Unlimited emotional support",
+                    "Deep personalization",
+                    "Advanced emotional pattern recognition",
+                    "Priority response times",
+                    "Safe, private, and judgment-free space"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-start">
+                      <Check className="h-5 w-5 text-clarly-500 mr-2 shrink-0 mt-0.5" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button className="w-full mt-8" size="lg" asChild>
+                  <Link to="/signup">Subscribe Now</Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
