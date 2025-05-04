@@ -6,7 +6,7 @@ const PricingSection = () => {
   return <section className="py-16 bg-gradient-to-b from-white to-muted/30">
       <div className="container">
         <h2 className="text-3xl font-bold text-center mb-4">One Flat Price, Unlimited Support</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">Unlimited 24/7 HelloClari chats —cheaper than a lunch, priceless for peace of mind.</p>
+        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">Unlimited 24/7 HelloClari chats - always there when you need to talk.</p>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {/* Free Tier */}
