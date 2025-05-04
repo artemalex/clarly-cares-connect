@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
 import { sendMessageToAPI } from "../utils/messageUtils";
 import { getGuestId } from "@/utils/guestUtils";
+import { MAX_FREE_MESSAGES } from "../constants";
 
 export function useMessageHandling(
   messages: Message[],

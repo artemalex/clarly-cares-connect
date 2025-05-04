@@ -5,11 +5,11 @@ import { MessageSquare, Heart, Brain, Shield, Sparkles, Zap } from "lucide-react
 const features = [{
   icon: <MessageSquare className="h-8 w-8 text-clarly-500" />,
   title: "Instant Space to Breathe",
-  description: "Overwhelmed at your desk? Clari is ready in seconds — no appointments, no waiting, just type and feel the pressure start to lift."
+  description: "Overwhelmed at your desk? HelloClari is ready in seconds — no appointments, no waiting, just type and feel the pressure start to lift."
 }, {
   icon: <Heart className="h-8 w-8 text-clarly-500" />,
   title: "Talk Without Judgment",
-  description: "Whether you're spiraling or just numb, Clari listens without fixing or labeling. Say what you need — unfiltered, uninterrupted."
+  description: "Whether you're spiraling or just numb, HelloClari listens without fixing or labeling. Say what you need — unfiltered, uninterrupted."
 }, {
   icon: <Brain className="h-8 w-8 text-clarly-500" />,
   title: "Process, Don't Just Vent",
@@ -17,15 +17,15 @@ const features = [{
 }, {
   icon: <Shield className="h-8 w-8 text-clarly-500" />,
   title: "Think More Clearly, Feel More in Control",
-  description: "As you talk, Clari helps organize your thoughts — so you leave the conversation feeling steadier and more self-aware."
+  description: "As you talk, HelloClari helps organize your thoughts — so you leave the conversation feeling steadier and more self-aware."
 }, {
   icon: <Sparkles className="h-8 w-8 text-clarly-500" />,
   title: "Build Emotional Habits, Effortlessly",
-  description: "The more you talk, the more Clari learns your emotional language — helping you spot patterns and grow without the pressure to \"perform.\""
+  description: "The more you talk, the more HelloClari learns your emotional language — helping you spot patterns and grow without the pressure to \"perform.\""
 }, {
   icon: <Zap className="h-8 w-8 text-clarly-500" />,
   title: "Support That's Always There",
-  description: "Whether it's a rough morning or a midnight spiral, Clari is on — as often as you need — for the cost of a single lunch."
+  description: "Whether it's a rough morning or a midnight spiral, HelloClari is on — as often as you need — for the cost of a single lunch."
 }];
 
 const FeaturesSection = () => {
