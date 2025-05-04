@@ -36,9 +36,7 @@ const ChatModeSelector = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">Vent to Release. Reflect to Explore.</DialogTitle>
-          <DialogDescription className="text-center">
-            No pressure. Just the kind of space you need.
-          </DialogDescription>
+          <DialogDescription className="text-center">Choose how you want to show up</DialogDescription>
         </DialogHeader>
         
         <div className="flex flex-col gap-4 py-4">
