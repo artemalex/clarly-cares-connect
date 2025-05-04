@@ -1,30 +1,33 @@
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare, Heart, Brain, Shield, Sparkles, Zap } from "lucide-react";
+
 const features = [{
   icon: <MessageSquare className="h-8 w-8 text-clarly-500" />,
-  title: "Instant Presence",
-  description: "Open the chat, type a word, and HelloClari answers in under two seconds—no office hours, no waiting room."
+  title: "Instant Space to Breathe",
+  description: "Overwhelmed at your desk? Clari is ready in seconds — no appointments, no waiting, just type and feel the pressure start to lift."
 }, {
   icon: <Heart className="h-8 w-8 text-clarly-500" />,
-  title: "Judgment-Free Listening",
-  description: "HelloClari never lectures, diagnoses, or reports—she simply stays until the weight feels lighter."
+  title: "Talk Without Judgment",
+  description: "Whether you're spiraling or just numb, Clari listens without fixing or labeling. Say what you need — unfiltered, uninterrupted."
 }, {
   icon: <Brain className="h-8 w-8 text-clarly-500" />,
-  title: "Two Ways to Talk",
-  description: "Pick **Vent** to dump the day or **Reflect** to untangle it. Switch anytime with one tap."
+  title: "Process, Don't Just Vent",
+  description: "Choose how you want to show up: Vent Mode to release what's stuck, or Reflect Mode to explore what's underneath it."
 }, {
   icon: <Shield className="h-8 w-8 text-clarly-500" />,
-  title: "Private & Secure",
-  description: "Your conversations stay between you and HelloClari. We only ask for your email to keep your account safe, and we never sell or share your data—ever."
+  title: "Think More Clearly, Feel More in Control",
+  description: "As you talk, Clari helps organize your thoughts — so you leave the conversation feeling steadier and more self-aware."
 }, {
   icon: <Sparkles className="h-8 w-8 text-clarly-500" />,
-  title: "Learns *You*, Never Shares",
-  description: "HelloClari adapts to your tone and patterns (not your identity) to mirror you better with every session."
+  title: "Build Emotional Habits, Effortlessly",
+  description: "The more you talk, the more Clari learns your emotional language — helping you spot patterns and grow without the pressure to \"perform.\""
 }, {
   icon: <Zap className="h-8 w-8 text-clarly-500" />,
-  title: "Unlimited Relief",
-  description: "Chat as often as you like—less than one lunch, and thousands less than weekly therapy."
+  title: "Support That's Always There",
+  description: "Whether it's a rough morning or a midnight spiral, Clari is on — as often as you need — for the cost of a single lunch."
 }];
+
 const FeaturesSection = () => {
   return <section className="py-16 bg-gradient-to-b from-white to-muted/30 rounded-xl">
       <div className="container">
@@ -45,4 +48,5 @@ const FeaturesSection = () => {
       </div>
     </section>;
 };
+
 export default FeaturesSection;
