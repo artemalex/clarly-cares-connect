@@ -50,7 +50,7 @@ const ChatModeSelector = ({
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
                   <li>Let it all out, just as it is</li>
                   <li>Feel seen, not analyzed</li>
-                  <li>Feel heard — not analyzed</li>
+                  <li>Talk like you would to a friend who actually gets it</li>
                 </ul>
               </div>
             </div>
