@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, isInitial = false } = await req.json();
+    const { messages, isInitial = false, conversation_id, guest_id, user_id } = await req.json();
     
     // Create a Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
@@ -27,6 +27,35 @@ serve(async (req) => {
     
     if (!openaiApiKey) {
       throw new Error("OPENAI_API_KEY is not set");
+    }
+
+    // Create a new conversation if this is the initial message and no conversation_id is provided
+    let activeConversationId = conversation_id;
+    let activeGuestId = guest_id;
+
+    if (isInitial && !activeConversationId) {
+      // Generate a new guest ID if not provided
+      if (!activeGuestId && !user_id) {
+        activeGuestId = crypto.randomUUID();
+      }
+
+      // Create a new conversation
+      const { data: conversationData, error: conversationError } = await supabase
+        .from('conversations')
+        .insert({
+          user_id: user_id || null,
+          guest_id: activeGuestId || null,
+          title: "New Conversation",
+          mode: "slow" // Default mode
+        })
+        .select('id')
+        .single();
+
+      if (conversationError) {
+        throw new Error(`Failed to create conversation: ${conversationError.message}`);
+      }
+
+      activeConversationId = conversationData.id;
     }
 
     // Format for the OpenAI API
@@ -66,8 +95,54 @@ serve(async (req) => {
 
     const message = data.choices[0].message.content;
 
+    // If this is a new conversation, store the AI message in the database
+    if (isInitial && activeConversationId) {
+      await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: activeConversationId,
+          user_id: user_id || null,
+          guest_id: activeGuestId || null,
+          role: 'assistant',
+          content: message
+        });
+
+      // Update user_limits if needed
+      if (user_id || activeGuestId) {
+        // Check if user_limits record exists
+        const { data: limitsData } = await supabase
+          .from('user_limits')
+          .select('*')
+          .or(`user_id.eq.${user_id ? user_id : null},guest_id.eq.${activeGuestId ? `'${activeGuestId}'` : null}`)
+          .maybeSingle();
+
+        if (limitsData) {
+          // Update existing record
+          await supabase
+            .from('user_limits')
+            .update({
+              messages_used: limitsData.messages_used + 1
+            })
+            .match(user_id ? { user_id } : { guest_id: activeGuestId });
+        } else {
+          // Create new record
+          await supabase
+            .from('user_limits')
+            .insert({
+              user_id: user_id || null,
+              guest_id: activeGuestId || null,
+              messages_used: 1
+            });
+        }
+      }
+    }
+
     return new Response(
-      JSON.stringify({ message }),
+      JSON.stringify({ 
+        message,
+        conversation_id: activeConversationId,
+        guest_id: activeGuestId
+      }),
       {
         headers: {
           ...corsHeaders,

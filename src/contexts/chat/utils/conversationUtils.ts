@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
@@ -100,51 +99,51 @@ export async function createConversation(mode: MessageMode, userId?: string, gue
 
 export async function generateInitialMessage(conversationId: string, mode: MessageMode) {
   try {
-    // Call the OpenAI API via Supabase Edge Function
+    // Check if user is logged in or guest
+    const { data: session } = await supabase.auth.getSession();
+    const user_id = session?.session?.user?.id;
+    const guest_id = getGuestId();
+
+    // Call the edge function to generate an initial message
     const { data, error } = await supabase.functions.invoke('chat', {
-      body: {
-        messages: [{ role: "system", content: SYSTEM_PROMPTS[mode] }],
-        isInitial: true
+      body: { 
+        messages: [], 
+        isInitial: true,
+        user_id,
+        guest_id,
+        conversation_id: conversationId
       }
     });
-    
+
     if (error) throw error;
     
-    const messageId = uuidv4();
-    
-    // Check if user is authenticated or guest
-    const session = await supabase.auth.getSession();
-    const userId = session.data.session?.user?.id;
-    const guestId = !userId ? getGuestId() : null;
-    
-    // Prepare message data
-    const messageData: any = {
-      id: messageId,
-      conversation_id: conversationId,
-      role: 'assistant',
-      content: data.message
-    };
-    
-    // Set either user_id or guest_id
-    if (userId) {
-      messageData.user_id = userId;
-    } else if (guestId) {
-      messageData.guest_id = guestId;
+    // Store conversation ID and guest ID from response
+    if (data.conversation_id) {
+      localStorage.setItem("conversation_id", data.conversation_id);
     }
     
-    // Store message in database
-    await supabase.from('chat_messages').insert(messageData);
-    
-    const assistantMessage: Message = {
-      id: messageId,
+    if (data.guest_id) {
+      localStorage.setItem("guest_id", data.guest_id);
+    }
+
+    // Create the message object
+    const message: Message = {
+      id: uuidv4(),
       role: "assistant",
       content: data.message,
       timestamp: new Date()
     };
-    
-    return { success: true, message: assistantMessage };
+
+    return {
+      success: true,
+      message,
+      conversationId: data.conversation_id || conversationId
+    };
   } catch (error) {
     console.error("Error generating initial message:", error);
-    return { success: false, error };
+    return {
+      success: false,
+      error
+    };
   }
 }

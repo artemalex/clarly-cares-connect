@@ -19,7 +19,8 @@ export function useMessageHandling(
   conversationId: string | null,
   setMessagesUsed: React.Dispatch<React.SetStateAction<number>>,
   checkSubscriptionStatus: () => Promise<void>,
-  startNewChat: () => Promise<void>
+  startNewChat: () => Promise<void>,
+  setConversationId: React.Dispatch<React.SetStateAction<string | null>>
 ) {
   // Send a message and get a response
   const sendMessage = async (content: string) => {
@@ -34,9 +35,16 @@ export function useMessageHandling(
 
     let activeConversationId = conversationId;
     if (!activeConversationId) {
-      // Start a new conversation
-      await startNewChat();
-      activeConversationId = conversationId;
+      // Try to get from localStorage
+      const savedId = localStorage.getItem("conversation_id");
+      if (savedId) {
+        activeConversationId = savedId;
+        setConversationId(savedId);
+      } else {
+        // Start a new conversation
+        await startNewChat();
+        activeConversationId = conversationId;
+      }
       
       // If still no conversation ID, something went wrong
       if (!activeConversationId) {
@@ -55,6 +63,11 @@ export function useMessageHandling(
       if (!result.success) {
         toast.error("Failed to get a response. Please try again.");
         return;
+      }
+      
+      // Update conversation ID if it changed
+      if (result.conversationId && result.conversationId !== activeConversationId) {
+        setConversationId(result.conversationId);
       }
       
       // Update local state with user message and AI response

@@ -41,7 +41,8 @@ export function useChatOperations() {
     conversationId,
     setMessagesUsed,
     checkSubscriptionStatus,
-    startNewChat
+    startNewChat,
+    setConversationId
   );
 
   // Check subscription status and load conversation if ID is provided
@@ -49,9 +50,21 @@ export function useChatOperations() {
     const initializeChat = async () => {
       await checkSubscriptionStatus();
       
+      // If URL has a conversation ID, load it
       if (urlConversationId) {
         await loadConversationData(urlConversationId);
-      } else if (messages.length === 0 && !isLoading) {
+      } 
+      // If localStorage has a conversation ID, try to use it
+      else if (localStorage.getItem("conversation_id") && messages.length === 0 && !isLoading) {
+        const savedId = localStorage.getItem("conversation_id");
+        if (savedId) {
+          await loadConversationData(savedId);
+        } else {
+          await startNewChat(true);
+        }
+      }
+      // If no conversation ID anywhere, start a new chat
+      else if (messages.length === 0 && !isLoading) {
         await startNewChat(true);
       }
     };

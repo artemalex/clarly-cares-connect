@@ -23,23 +23,8 @@ export async function sendMessageToAPI(
     
     // Check if user is logged in or guest
     const { data: session } = await supabase.auth.getSession();
-    const user_id = session.session?.user?.id;
+    const user_id = session?.session?.user?.id;
     const guest_id = getGuestId();
-    
-    // Prepare message data
-    const messageData: any = {
-      id: messageId,
-      conversation_id: conversationId,
-      role: 'user',
-      content
-    };
-    
-    // Set either user_id or guest_id
-    if (user_id) {
-      messageData.user_id = user_id;
-    } else if (guest_id) {
-      messageData.guest_id = guest_id;
-    }
     
     // Call the chat function directly with both user_id and guest_id
     const { data, error } = await supabase.functions.invoke('chat', {
@@ -54,22 +39,6 @@ export async function sendMessageToAPI(
     if (error) throw error;
     
     const assistantMessageId = uuidv4();
-    
-    // Prepare assistant message data
-    const assistantMessageData: any = {
-      id: assistantMessageId,
-      conversation_id: conversationId,
-      role: 'assistant',
-      content: data.message
-    };
-    
-    // Set either user_id or guest_id for assistant message
-    if (user_id) {
-      assistantMessageData.user_id = user_id;
-    } else if (guest_id) {
-      assistantMessageData.guest_id = guest_id;
-    }
-    
     const assistantMessage: Message = {
       id: assistantMessageId,
       role: "assistant",
@@ -77,10 +46,21 @@ export async function sendMessageToAPI(
       timestamp: new Date()
     };
 
+    // Update the conversation_id in localStorage if it was provided in the response
+    if (data.conversation_id) {
+      localStorage.setItem("conversation_id", data.conversation_id);
+    }
+    
+    // Update the guest_id in localStorage if it was provided in the response
+    if (data.guest_id) {
+      localStorage.setItem("guest_id", data.guest_id);
+    }
+
     return { 
       success: true, 
       userMessage, 
-      assistantMessage 
+      assistantMessage,
+      conversationId: data.conversation_id || conversationId
     };
     
   } catch (error) {
