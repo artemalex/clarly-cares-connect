@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
 import { sendMessageToAPI } from "../utils/messageUtils";
+import { getGuestId } from "@/utils/guestUtils";
 
 export function useMessageHandling(
   messages: Message[],
@@ -62,9 +63,25 @@ export function useMessageHandling(
       const session = await supabase.auth.getSession();
       const userId = session.data.session?.user?.id;
       
-      // Increment message count for guest users - only for user messages
+      // Increment message count
       if (!userId) {
-        setMessagesUsed(prev => prev + 1);
+        // Guest user - update the count
+        const guestId = getGuestId();
+        if (guestId) {
+          // Update guest message count in database
+          await supabase.from('user_limits')
+            .upsert({
+              guest_id: guestId,
+              messages_used: messagesUsed + 1,
+              messages_limit: MAX_FREE_MESSAGES
+            }, {
+              onConflict: 'guest_id'
+            });
+          
+          setMessagesUsed(prev => prev + 1);
+        } else {
+          console.error("No guest ID found when updating message count");
+        }
       } else {
         // Reload message usage count if user is logged in
         await checkSubscriptionStatus();

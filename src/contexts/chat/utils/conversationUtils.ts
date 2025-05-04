@@ -4,14 +4,18 @@ import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
 import { SYSTEM_PROMPTS } from "../constants";
 import { toast } from "sonner";
+import { getGuestId } from "@/utils/guestUtils";
 
 export async function loadConversation(id: string) {
   try {
     // Check if user is logged in
     const session = await supabase.auth.getSession();
-    if (!session.data.session) {
+    const guestId = getGuestId();
+    
+    // If not logged in and no guest ID, cannot access conversations
+    if (!session.data.session && !guestId) {
       toast.error("You must be logged in to view conversations");
-      return { success: false, error: "Not logged in" };
+      return { success: false, error: "Not logged in or no guest ID" };
     }
     
     // Fetch conversation details
@@ -58,25 +62,40 @@ export async function loadConversation(id: string) {
   }
 }
 
-export async function createConversation(mode: MessageMode, userId?: string) {
+export async function createConversation(mode: MessageMode, userId?: string, guestId?: string | null) {
   const newConversationId = uuidv4();
   
-  // If user is logged in, save conversation to database
-  if (userId) {
-    const { error } = await supabase.from('conversations').insert({
+  try {
+    // Create conversation data
+    const conversationData: any = {
       id: newConversationId,
       mode,
-      user_id: userId,
       title: "New Conversation" // Default title, can be updated later
-    });
+    };
+    
+    // Set either user_id or guest_id
+    if (userId) {
+      conversationData.user_id = userId;
+    } else if (guestId) {
+      conversationData.guest_id = guestId;
+    } else {
+      return { success: false };
+    }
+    
+    // Insert the conversation
+    const { error } = await supabase.from('conversations').insert(conversationData);
     
     if (error) {
       toast.error("Failed to create new conversation");
+      console.error("Error creating conversation:", error);
       return { success: false };
     }
+    
+    return { success: true, conversationId: newConversationId };
+  } catch (error) {
+    console.error("Error creating conversation:", error);
+    return { success: false };
   }
-
-  return { success: true, conversationId: newConversationId };
 }
 
 export async function generateInitialMessage(conversationId: string, mode: MessageMode) {
@@ -93,17 +112,28 @@ export async function generateInitialMessage(conversationId: string, mode: Messa
     
     const messageId = uuidv4();
     
-    // For logged in users, store message in database
+    // Check if user is authenticated or guest
     const session = await supabase.auth.getSession();
-    if (session.data.session?.user) {
-      await supabase.from('chat_messages').insert({
-        id: messageId,
-        conversation_id: conversationId,
-        role: 'assistant',
-        content: data.message,
-        user_id: session.data.session.user.id
-      });
+    const userId = session.data.session?.user?.id;
+    const guestId = !userId ? getGuestId() : null;
+    
+    // Prepare message data
+    const messageData: any = {
+      id: messageId,
+      conversation_id: conversationId,
+      role: 'assistant',
+      content: data.message
+    };
+    
+    // Set either user_id or guest_id
+    if (userId) {
+      messageData.user_id = userId;
+    } else if (guestId) {
+      messageData.guest_id = guestId;
     }
+    
+    // Store message in database
+    await supabase.from('chat_messages').insert(messageData);
     
     const assistantMessage: Message = {
       id: messageId,

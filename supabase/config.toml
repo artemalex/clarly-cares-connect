@@ -1,1 +1,48 @@
+
 project_id = "hfnnbcvqhdbwylxmcwjb"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+port = 54325
+
+[storage]
+enabled = true
+port = 54326
+
+[realtime]
+enabled = true
+port = 54327
+
+[edge_functions]
+enabled = true
+port = 54328
+
+[analytics]
+enabled = false
+port = 54329
+
+[experimental]
+enabled = false
+port = 54330
+
+[functions.set-guest-claims]
+verify_jwt = false
+
+[functions.migrate-guest-data]
+verify_jwt = true

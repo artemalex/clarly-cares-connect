@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
+import { clearGuestId, getGuestId } from "@/utils/guestUtils";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -42,6 +43,9 @@ const Signup = () => {
     setIsLoading(true);
     
     try {
+      // Store the guest ID before signing up
+      const guestId = getGuestId();
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -50,6 +54,23 @@ const Signup = () => {
       if (error) throw error;
       
       if (data.user) {
+        // If there was a guest ID, migrate the data
+        if (guestId) {
+          try {
+            await supabase.functions.invoke('migrate-guest-data', {
+              body: { guest_id: guestId }
+            });
+            
+            // Clear the guest ID after successful migration
+            clearGuestId();
+            
+            toast.success("Your previous chat history has been saved to your account!");
+          } catch (migrationError) {
+            console.error("Failed to migrate guest data:", migrationError);
+            // Don't throw here, we still want to complete signup
+          }
+        }
+        
         toast.success("Account created successfully!");
         navigate("/chat");
       }
@@ -64,6 +85,14 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     setIsLoading(true);
     try {
+      // Store the guest ID before signing up
+      const guestId = getGuestId();
+      
+      // If there was a guest ID, store it in localStorage to be used after OAuth redirect
+      if (guestId) {
+        localStorage.setItem('pending_guest_migration', guestId);
+      }
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

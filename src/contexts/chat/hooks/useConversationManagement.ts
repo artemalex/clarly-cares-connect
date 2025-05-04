@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
 import { loadConversation, createConversation, generateInitialMessage } from "../utils/conversationUtils";
+import { ensureGuestId, getGuestId } from "@/utils/guestUtils";
 
 export function useConversationManagement() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,7 +36,7 @@ export function useConversationManagement() {
       };
     }
   })();
-
+  
   // Save mode to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("clarlyMode", mode);
@@ -71,9 +71,25 @@ export function useConversationManagement() {
     try {
       const session = await supabase.auth.getSession();
       const userId = session.data.session?.user?.id;
+      let guestId = null;
+      
+      // If not authenticated, use guest ID
+      if (!userId) {
+        guestId = ensureGuestId();
+        
+        // Set the guest claim in the JWT
+        try {
+          await supabase.functions.invoke('set-guest-claims', {
+            body: { guest_id: guestId }
+          });
+        } catch (error) {
+          console.error("Error setting guest claims:", error);
+          // Continue anyway as this is non-critical
+        }
+      }
       
       // Create a new conversation
-      const result = await createConversation(mode, userId);
+      const result = await createConversation(mode, userId, guestId);
       if (!result.success) return;
       
       // Update state with the new conversation ID

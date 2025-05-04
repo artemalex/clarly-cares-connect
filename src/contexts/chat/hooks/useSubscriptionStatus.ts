@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { MAX_FREE_MESSAGES } from "../constants";
+import { ensureGuestId, getGuestId } from "@/utils/guestUtils";
 
 export function useSubscriptionStatus() {
   const [messagesUsed, setMessagesUsed] = useState<number>(0);
@@ -15,15 +16,38 @@ export function useSubscriptionStatus() {
     try {
       const session = await supabase.auth.getSession();
       
-      // Skip checking subscription if user is not logged in
+      // If user is not logged in, check guest message count
       if (!session.data.session) {
         console.log("No active session, using free tier limits");
         setMessagesLimit(MAX_FREE_MESSAGES);
         setIsSubscribed(false);
+        
+        // Get guest ID, ensure one exists
+        const guestId = ensureGuestId();
+        
+        // Load guest message count
+        const { data: guestData, error: guestError } = await supabase
+          .from('user_limits')
+          .select('messages_used')
+          .eq('guest_id', guestId)
+          .maybeSingle();
+          
+        if (!guestError && guestData) {
+          setMessagesUsed(guestData.messages_used);
+        } else {
+          // Create initial record for guest
+          await supabase.from('user_limits').insert({
+            guest_id: guestId,
+            messages_used: 0,
+            messages_limit: MAX_FREE_MESSAGES
+          });
+          setMessagesUsed(0);
+        }
+        
         return;
       }
       
-      // Call the subscription check function
+      // Call the subscription check function for logged in users
       const { data, error } = await supabase.functions.invoke('check-subscription');
       
       if (error) {
@@ -39,6 +63,7 @@ export function useSubscriptionStatus() {
       const { data: userData, error: userError } = await supabase
         .from('user_limits')
         .select('messages_used')
+        .eq('user_id', session.data.session.user.id)
         .maybeSingle();
         
       if (userError) {
