@@ -14,6 +14,7 @@ export type Database = {
           content: string
           conversation_id: string | null
           created_at: string
+          guest_id: string | null
           id: string
           role: string
           user_id: string | null
@@ -22,6 +23,7 @@ export type Database = {
           content: string
           conversation_id?: string | null
           created_at?: string
+          guest_id?: string | null
           id?: string
           role: string
           user_id?: string | null
@@ -30,6 +32,7 @@ export type Database = {
           content?: string
           conversation_id?: string | null
           created_at?: string
+          guest_id?: string | null
           id?: string
           role?: string
           user_id?: string | null
@@ -47,6 +50,7 @@ export type Database = {
       conversations: {
         Row: {
           created_at: string
+          guest_id: string | null
           id: string
           mode: string
           title: string | null
@@ -55,6 +59,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          guest_id?: string | null
           id?: string
           mode: string
           title?: string | null
@@ -63,6 +68,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          guest_id?: string | null
           id?: string
           mode?: string
           title?: string | null
@@ -110,6 +116,7 @@ export type Database = {
       user_limits: {
         Row: {
           created_at: string
+          guest_id: string | null
           id: string
           messages_limit: number
           messages_used: number
@@ -118,6 +125,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          guest_id?: string | null
           id?: string
           messages_limit?: number
           messages_used?: number
@@ -126,6 +134,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          guest_id?: string | null
           id?: string
           messages_limit?: number
           messages_used?: number

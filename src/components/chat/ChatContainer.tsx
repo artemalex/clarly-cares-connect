@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const ChatContainer = () => {
   const { isLoading, setMode, startNewChat, messages } = useChatContext();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showModeSelector, setShowModeSelector] = useState(messages.length === 0);
+  const [showModeSelector, setShowModeSelector] = useState(false);
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
 

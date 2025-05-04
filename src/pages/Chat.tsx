@@ -70,7 +70,7 @@ const Chat = () => {
               "font-bold transition-all",
               isScrolled ? "text-lg" : "text-xl sm:text-2xl"
             )}>
-              Chat with HelloClarly
+              Chat with HelloClari
             </h1>
             <div className="flex space-x-2">
               <Button 
