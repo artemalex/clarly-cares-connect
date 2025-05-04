@@ -1,47 +1,286 @@
 
+# A string used to distinguish different Supabase projects on the same host. Defaults to the
+# working directory name when running `supabase init`.
 project_id = "hfnnbcvqhdbwylxmcwjb"
 
 [api]
 enabled = true
+# Port to use for the API URL.
 port = 54321
+# Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
+# endpoints. public and storage are always included.
 schemas = ["public", "storage", "graphql_public"]
+# Extra schemas to add to the search_path of every request. public is always included.
+extra_search_path = ["public", "extensions"]
+# The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
+# for accidental or malicious requests.
+max_rows = 1000
 
 [db]
+# Port to use for the local database URL.
 port = 54322
+# Port used by db diff command to initialize the shadow database.
+shadow_port = 54320
+# The database major version to use. This has to be the same as your remote database's. Run `SHOW
+# server_version;` on the remote database to check.
+major_version = 15
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[realtime]
+enabled = false
 
 [studio]
 enabled = true
+# Port to use for Supabase Studio.
 port = 54323
+# External URL to skip URL validation in API and Studio.
+api_url = "https://hfnnbcvqhdbwylxmcwjb.supabase.co"
 
+# Email testing server. Emails sent with the local dev setup are not actually sent - the emails are
+# monitored and accessible from the debug interface.
 [inbucket]
-enabled = true
+enabled = false
+# Port to use for the email testing server web interface.
 port = 54324
-
-[auth]
-enabled = true
-port = 54325
+# Pop3 Port to use for the email testing server web interface.
+pop3_port = 54325
+# Smtp Port to use for the email testing server web interface.
+smtp_port = 54326
 
 [storage]
 enabled = true
-port = 54326
+# The maximum file size allowed (e.g. "5MB", "500KB").
+file_size_limit = "50MiB"
 
-[realtime]
+[auth]
 enabled = true
-port = 54327
+# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
+# in emails.
+site_url = "http://localhost:3000"
+# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
+additional_redirect_urls = ["https://localhost:3000"]
+# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
+jwt_expiry = 3600
+# If disabled, the refresh token will never expire.
+enable_refresh_token_rotation = true
+# Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.
+# Defaults to 10, maximum 604,800 (1 week).
+refresh_token_reuse_interval = 10
+# Allow/disallow new user signups to your project.
+enable_signup = true
 
-[edge_functions]
-enabled = true
-port = 54328
+[auth.email]
+# Allow/disallow new user signups via email to your project.
+enable_signup = true
+# If enabled, a user will be required to confirm any email change on both the old, and new email
+# addresses. If disabled, only the new email is required to confirm.
+double_confirm_changes = true
+# If enabled, users need to confirm their email address before signing in.
+enable_confirmations = false
+
+[auth.sms]
+# Allow/disallow new user signups via SMS to your project.
+enable_signup = true
+# If enabled, users need to confirm their phone number before signing in.
+enable_confirmations = false
+
+[auth.external.apple]
+enabled = false
+# The Apple Client ID. Example: "com.example.app".
+client_id = ""
+# (Optional) The Apple Secret. If provided, Supabase Auth will use it to validate tokens.
+secret = ""
+# (Optional) The Authorization URL. Overrides the default authorization endpoint.
+authorization_endpoint = ""
+# (Optional) The URL for JSON Web Key Sets. Overrides the default URL.
+jwks_endpoint = ""
+# (Optional) The Token URL. Overrides the default token endpoint.
+token_endpoint = ""
+
+[auth.external.azure]
+enabled = false
+# The Azure Client ID.
+client_id = ""
+# The Azure Client Secret.
+secret = ""
+# The Azure URL. Overrides the default authorization endpoint.
+url = ""
+
+[auth.external.azuread]
+enabled = false
+# The AzureAD Client ID.
+client_id = ""
+# The AzureAD Client Secret.
+secret = ""
+# The AzureAD Authorization URL. Overrides the default authorization endpoint.
+url = ""
+
+[auth.external.bitbucket]
+enabled = false
+# The Bitbucket Client ID.
+client_id = ""
+# The Bitbucket Client Secret.
+secret = ""
+
+[auth.external.discord]
+enabled = false
+# The Discord Client ID.
+client_id = ""
+# The Discord Client Secret.
+secret = ""
+
+[auth.external.facebook]
+enabled = false
+# The Facebook Client ID.
+client_id = ""
+# The Facebook Client Secret.
+secret = ""
+# (Optional) The Facebook Authorization URL. Overrides the default authorization endpoint.
+authorization_endpoint = ""
+# (Optional) The Facebook Token URL. Overrides the default token endpoint.
+token_endpoint = ""
+# (Optional) The Facebook User Info URL. Overrides the default user info endpoint.
+userinfo_endpoint = ""
+
+[auth.external.figma]
+enabled = false
+# The Figma Client ID.
+client_id = ""
+# The Figma Client Secret.
+secret = ""
+
+[auth.external.github]
+enabled = false
+# The GitHub Client ID.
+client_id = ""
+# The GitHub Client Secret.
+secret = ""
+
+[auth.external.gitlab]
+enabled = false
+# The GitLab Client ID.
+client_id = ""
+# The GitLab Client Secret.
+secret = ""
+# The GitLab URL. Overrides the default authorization endpoint.
+url = ""
+
+[auth.external.google]
+enabled = false
+# The Google Client ID.
+client_id = ""
+# The Google Client Secret.
+secret = ""
+# (Optional) The Google Authorization URL. Overrides the default authorization endpoint.
+authorization_endpoint = ""
+# (Optional) The Google Token URL. Overrides the default token endpoint.
+token_endpoint = ""
+# (Optional) The Google User Info URL. Overrides the default user info endpoint.
+userinfo_endpoint = ""
+
+[auth.external.kakao]
+enabled = false
+# The Kakao Client ID.
+client_id = ""
+# The Kakao Client Secret.
+secret = ""
+
+[auth.external.keycloak]
+enabled = false
+# The Keycloak Client ID.
+client_id = ""
+# The Keycloak Client Secret.
+secret = ""
+# The Keycloak URL. Overrides the default authorization endpoint.
+url = ""
+
+[auth.external.linkedin]
+enabled = false
+# The LinkedIn Client ID.
+client_id = ""
+# The LinkedIn Client Secret.
+secret = ""
+
+[auth.external.notion]
+enabled = false
+# The Notion Client ID.
+client_id = ""
+# The Notion Client Secret.
+secret = ""
+
+[auth.external.spotify]
+enabled = false
+# The Spotify Client ID.
+client_id = ""
+# The Spotify Client Secret.
+secret = ""
+
+[auth.external.slack]
+enabled = false
+# The Slack Client ID.
+client_id = ""
+# The Slack Client Secret.
+secret = ""
+
+[auth.external.twitch]
+enabled = false
+# The Twitch Client ID.
+client_id = ""
+# The Twitch Client Secret.
+secret = ""
+
+[auth.external.twitter]
+enabled = false
+# The Twitter Client ID.
+client_id = ""
+# The Twitter Client Secret.
+secret = ""
+
+[auth.external.workos]
+enabled = false
+# The WorkOS Client ID.
+client_id = ""
+# The WorkOS Client Secret.
+secret = ""
+
+[auth.external.zoom]
+enabled = false
+# The Zoom Client ID.
+client_id = ""
+# The Zoom Client Secret.
+secret = ""
 
 [analytics]
 enabled = false
-port = 54329
+port = 54327
+vector_port = 54328
+# Configure one of these backends
+backend = "postgres"
 
+# Experimental features may change behavior in the future.
 [experimental]
-enabled = false
-port = 54330
+# Configures Postgres storage engine to use PebblesDB.
+postgres_pebblesdb = false
+# Configures analytics to use Rust.
+analytics_rust = false
 
-[functions.set-guest-claims]
+# Configures OpenAI integration
+[ai]
+# Controls if AI features are enabled.
+enabled = false
+
+[functions]
+# Port to use for Functions API URL.
+port = 54332
+function_patterns = ["*"]
+
+[functions.send-conversation]
 verify_jwt = false
 
 [functions.migrate-guest-data]

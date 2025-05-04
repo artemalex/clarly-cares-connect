@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -76,34 +77,51 @@ export function useConversationManagement() {
       // If not authenticated, use guest ID
       if (!userId) {
         guestId = ensureGuestId();
+      }
+      
+      // Direct invocation of the send-conversation edge function
+      if (!userId && guestId) {
+        const response = await supabase.functions.invoke("send-conversation", {
+          body: {
+            guest_id: guestId,
+            title: "New Conversation",
+            mode
+          }
+        });
         
-        // Set the guest claim in the JWT
-        try {
-          await supabase.functions.invoke('set-guest-claims', {
-            body: { guest_id: guestId }
-          });
-        } catch (error) {
-          console.error("Error setting guest claims:", error);
-          // Continue anyway as this is non-critical
+        if (response.error) {
+          console.error("Conversation creation failed", response.error);
+          toast.error("Failed to start new chat");
+          return;
         }
-      }
-      
-      // Create a new conversation
-      const result = await createConversation(mode, userId, guestId);
-      if (!result.success) return;
-      
-      // Update state with the new conversation ID
-      setConversationId(result.conversationId);
-      setMessages([]);
-      
-      // Update URL for logged in users
-      if (userId) {
-        navigate(`/chat/${result.conversationId}`, { replace: true });
-      }
-      
-      // If this isn't the initial call, generate the first message
-      if (!isInitial) {
-        await generateFirstMessage(result.conversationId);
+        
+        if (response.data && response.data.conversationId) {
+          setConversationId(response.data.conversationId);
+          setMessages([]);
+          
+          if (!isInitial) {
+            await generateFirstMessage(response.data.conversationId);
+          }
+          return;
+        }
+      } else {
+        // Create a new conversation for logged in users (using existing method)
+        const result = await createConversation(mode, userId, guestId);
+        if (!result.success) return;
+        
+        // Update state with the new conversation ID
+        setConversationId(result.conversationId);
+        setMessages([]);
+        
+        // Update URL for logged in users
+        if (userId) {
+          navigate(`/chat/${result.conversationId}`, { replace: true });
+        }
+        
+        // If this isn't the initial call, generate the first message
+        if (!isInitial) {
+          await generateFirstMessage(result.conversationId);
+        }
       }
     } catch (error) {
       console.error("Error starting new chat:", error);

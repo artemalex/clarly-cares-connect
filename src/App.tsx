@@ -42,16 +42,8 @@ const AppContent = () => {
         }
       } else {
         // User is not logged in, ensure guest ID
-        const guestId = ensureGuestId();
-        
-        // Set guest claim in JWT
-        try {
-          await supabase.functions.invoke('set-guest-claims', {
-            body: { guest_id: guestId }
-          });
-        } catch (error) {
-          console.error("Error setting guest claims:", error);
-        }
+        ensureGuestId();
+        // Removed the set-guest-claims function call
       }
     };
     
