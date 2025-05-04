@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -5,10 +6,12 @@ import { MessageMode } from "@/contexts/chat";
 interface HeroSectionProps {
   selectedMode: MessageMode;
   handleStartChat: (mode: MessageMode) => void;
+  handleOpenModeSelector: () => void;
 }
 const HeroSection = ({
   selectedMode,
-  handleStartChat
+  handleStartChat,
+  handleOpenModeSelector
 }: HeroSectionProps) => {
   return <section className="bg-gradient-to-b from-clarly-50/50 to-support-50/50 py-16 md:py-24">
       <div className="container">
@@ -19,10 +22,8 @@ const HeroSection = ({
               Instant, confidential AI support—no HR forms, no therapy bills, just calm breath back.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="px-8 py-6 text-lg" asChild>
-                <Link to="/chat" onClick={() => handleStartChat(selectedMode)}>
-                  Start Chatting <ArrowRight className="ml-2" />
-                </Link>
+              <Button size="lg" className="px-8 py-6 text-lg" onClick={handleOpenModeSelector}>
+                Start Chatting <ArrowRight className="ml-2" />
               </Button>
               <Button size="lg" variant="outline" className="px-8 py-6 text-lg" asChild>
                 <Link to="/signup">Create Account</Link>

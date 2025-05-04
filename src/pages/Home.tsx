@@ -61,14 +61,16 @@ const Home = () => {
       {/* Component Sections */}
       <HeroSection 
         selectedMode={selectedMode} 
-        handleStartChat={handleStartChat} 
+        handleStartChat={handleStartChat}
+        handleOpenModeSelector={handleOpenModeSelector}
       />
       <FeaturesSection />
       <TestimonialsSection />
       <PricingSection />
       <CTASection 
         selectedMode={selectedMode} 
-        handleStartChat={handleStartChat} 
+        handleStartChat={handleStartChat}
+        handleOpenModeSelector={handleOpenModeSelector}
       />
       
       {/* Sticky CTA that appears after scrolling */}
