@@ -1,29 +1,36 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { MessageSquare, Heart, Brain, Shield, Sparkles, Zap } from "lucide-react";
+import { 
+  Hourglass,
+  Heart,
+  BranchPathPoints,
+  ThoughtBubble,
+  GrowingPlant,
+  LifeBuoy
+} from "lucide-react";
 
 const features = [{
-  icon: <MessageSquare className="h-8 w-8 text-clarly-500" />,
+  icon: <Hourglass className="h-8 w-8 text-empath-500" />,
   title: "Instant Space to Breathe",
   description: "Overwhelmed at your desk? HelloClari is ready in seconds — no appointments, no waiting, just type and feel the pressure start to lift."
 }, {
-  icon: <Heart className="h-8 w-8 text-clarly-500" />,
+  icon: <Heart className="h-8 w-8 text-empath-500" />,
   title: "Talk Without Judgment",
   description: "Whether you're spiraling or just numb, HelloClari listens without fixing or labeling. Say what you need — unfiltered, uninterrupted."
 }, {
-  icon: <Brain className="h-8 w-8 text-clarly-500" />,
+  icon: <BranchPathPoints className="h-8 w-8 text-empath-500" />,
   title: "Process, Don't Just Vent",
   description: "Choose how you want to show up: Vent Mode to release what's stuck, or Reflect Mode to explore what's underneath it."
 }, {
-  icon: <Shield className="h-8 w-8 text-clarly-500" />,
+  icon: <ThoughtBubble className="h-8 w-8 text-empath-500" />,
   title: "Think More Clearly, Feel More in Control",
   description: "As you talk, HelloClari helps organize your thoughts — so you leave the conversation feeling steadier and more self-aware."
 }, {
-  icon: <Sparkles className="h-8 w-8 text-clarly-500" />,
+  icon: <GrowingPlant className="h-8 w-8 text-empath-500" />,
   title: "Build Emotional Habits, Effortlessly",
   description: "The more you talk, the more HelloClari learns your emotional language — helping you spot patterns and grow without the pressure to \"perform.\""
 }, {
-  icon: <Zap className="h-8 w-8 text-clarly-500" />,
+  icon: <LifeBuoy className="h-8 w-8 text-empath-500" />,
   title: "Support That's Always There",
   description: "Whether it's a rough morning or a midnight spiral, HelloClari is on — as often as you need — for the cost of a single lunch."
 }];
