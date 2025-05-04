@@ -35,20 +35,16 @@ const ChatModeSelector = ({
   return <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center">Vent to Release. Reflect to Explore.</DialogTitle>
-          <DialogDescription className="text-center">Choose how you want to show up</DialogDescription>
+          <DialogTitle className="text-center">Pick the mode that fits your mood</DialogTitle>
+          
         </DialogHeader>
         
         <div className="flex flex-col gap-4 py-4">
           <button onClick={() => setSelectedMode("vent")} className={cn("flex items-start gap-3 p-4 rounded-lg border transition-all", selectedMode === "vent" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50")}>
-            <div className={cn("mt-1 p-2 rounded-full", selectedMode === "vent" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
-              <Zap className="h-5 w-5" />
-            </div>
+            
             <div className="text-left">
               <h3 className="font-medium">🔥 Vent Mode</h3>
-              <p className="text-sm text-muted-foreground">
-                Say it all. No filters, no fixing.
-              </p>
+              
               
               <div className="mt-2">
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
@@ -61,14 +57,10 @@ const ChatModeSelector = ({
           </button>
           
           <button onClick={() => setSelectedMode("slow")} className={cn("flex items-start gap-3 p-4 rounded-lg border transition-all", selectedMode === "slow" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50")}>
-            <div className={cn("mt-1 p-2 rounded-full", selectedMode === "slow" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
-              <Clock className="h-5 w-5" />
-            </div>
+            
             <div className="text-left">
               <h3 className="font-medium">🧠 Reflect Mode</h3>
-              <p className="text-sm text-muted-foreground">
-                Slow down. Think it through.
-              </p>
+              
               
               <div className="mt-2">
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
