@@ -9,7 +9,7 @@ export async function sendMessageToAPI(
   content: string, 
   messages: Message[], 
   mode: MessageMode,
-  conversationId: string
+  conversationId: string | null
 ) {
   try {
     // Create user message object for local state
@@ -26,13 +26,18 @@ export async function sendMessageToAPI(
     const user_id = session?.session?.user?.id;
     const guest_id = getGuestId();
     
-    // Call the chat function directly with both user_id and guest_id
+    // Determine if this is an initial message (no messages and no conversation ID)
+    const isInitial = messages.length === 0 && !conversationId;
+    
+    // Call the chat function with appropriate parameters
     const { data, error } = await supabase.functions.invoke('chat', {
       body: { 
         messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
         user_id,
         guest_id,
-        conversation_id: conversationId
+        conversation_id: conversationId,
+        isInitial,
+        mode
       }
     });
     
