@@ -19,7 +19,7 @@ const features = [{
   description: "Whether you're spiraling or just numb, HelloClari listens without fixing or labeling. Say what you need — unfiltered, uninterrupted."
 }, {
   icon: <GitBranch className="h-8 w-8 text-empath-500" />,
-  title: "Process, Don't Just Vent",
+  title: "Vent to Release. Reflect to Explore.",
   description: "Choose how you want to show up: Vent Mode to release what's stuck, or Reflect Mode to explore what's underneath it."
 }, {
   icon: <CloudCog className="h-8 w-8 text-empath-500" />,
