@@ -3,9 +3,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { 
   Hourglass,
   Heart,
-  BranchPathPoints,
-  ThoughtBubble,
-  GrowingPlant,
+  GitBranch,
+  CloudCog,
+  Sprout,
   LifeBuoy
 } from "lucide-react";
 
@@ -18,15 +18,15 @@ const features = [{
   title: "Talk Without Judgment",
   description: "Whether you're spiraling or just numb, HelloClari listens without fixing or labeling. Say what you need — unfiltered, uninterrupted."
 }, {
-  icon: <BranchPathPoints className="h-8 w-8 text-empath-500" />,
+  icon: <GitBranch className="h-8 w-8 text-empath-500" />,
   title: "Process, Don't Just Vent",
   description: "Choose how you want to show up: Vent Mode to release what's stuck, or Reflect Mode to explore what's underneath it."
 }, {
-  icon: <ThoughtBubble className="h-8 w-8 text-empath-500" />,
+  icon: <CloudCog className="h-8 w-8 text-empath-500" />,
   title: "Think More Clearly, Feel More in Control",
   description: "As you talk, HelloClari helps organize your thoughts — so you leave the conversation feeling steadier and more self-aware."
 }, {
-  icon: <GrowingPlant className="h-8 w-8 text-empath-500" />,
+  icon: <Sprout className="h-8 w-8 text-empath-500" />,
   title: "Build Emotional Habits, Effortlessly",
   description: "The more you talk, the more HelloClari learns your emotional language — helping you spot patterns and grow without the pressure to \"perform.\""
 }, {
