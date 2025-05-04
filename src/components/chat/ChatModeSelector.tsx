@@ -65,7 +65,7 @@ const ChatModeSelector = ({
               <div className="mt-2">
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
                   <li>Unpack what you’re feeling, one layer at a time</li>
-                  <li>Spot patterns and gently explore what’s behind them</li>
+                  <li>Gently spot what’s behind the patterns</li>
                   <li>Talk freely with someone who listens — and helps you go deeper</li>
                 </ul>
               </div>
