@@ -22,9 +22,9 @@ export async function sendMessageToAPI(
     };
     
     // Check if user is logged in or guest
-    const session = await supabase.auth.getSession();
-    const userId = session.data.session?.user?.id;
-    const guestId = !userId ? getGuestId() : null;
+    const { data: session } = await supabase.auth.getSession();
+    const user_id = session.session?.user?.id;
+    const guest_id = getGuestId();
     
     // Prepare message data
     const messageData: any = {
@@ -35,26 +35,20 @@ export async function sendMessageToAPI(
     };
     
     // Set either user_id or guest_id
-    if (userId) {
-      messageData.user_id = userId;
-    } else if (guestId) {
-      messageData.guest_id = guestId;
+    if (user_id) {
+      messageData.user_id = user_id;
+    } else if (guest_id) {
+      messageData.guest_id = guest_id;
     }
     
-    // Save message to database
-    await supabase.from('chat_messages').insert(messageData);
-    
-    // Prepare messages for the OpenAI API
-    const messageHistory = [...messages, userMessage]
-      .filter(msg => msg.role !== "system") // Filter out any previous system messages
-      .map(({ role, content }) => ({ role, content }));
-    
-    // Add the system prompt at the beginning based on selected mode
-    messageHistory.unshift({ role: "system", content: SYSTEM_PROMPTS[mode] });
-    
-    // Call the OpenAI API via Supabase Edge Function
+    // Call the chat function directly with both user_id and guest_id
     const { data, error } = await supabase.functions.invoke('chat', {
-      body: { messages: messageHistory }
+      body: { 
+        messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+        user_id,
+        guest_id,
+        conversation_id: conversationId
+      }
     });
     
     if (error) throw error;
@@ -69,15 +63,12 @@ export async function sendMessageToAPI(
       content: data.message
     };
     
-    // Set either user_id or guest_id
-    if (userId) {
-      assistantMessageData.user_id = userId;
-    } else if (guestId) {
-      assistantMessageData.guest_id = guestId;
+    // Set either user_id or guest_id for assistant message
+    if (user_id) {
+      assistantMessageData.user_id = user_id;
+    } else if (guest_id) {
+      assistantMessageData.guest_id = guest_id;
     }
-    
-    // Save AI response to database
-    await supabase.from('chat_messages').insert(assistantMessageData);
     
     const assistantMessage: Message = {
       id: assistantMessageId,

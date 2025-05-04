@@ -60,33 +60,12 @@ export function useMessageHandling(
       // Update local state with user message and AI response
       setMessages(prevMessages => [...prevMessages, result.userMessage, result.assistantMessage]);
       
-      // Check if user is logged in
-      const session = await supabase.auth.getSession();
-      const userId = session.data.session?.user?.id;
+      // For all users (both logged in and guest), increment the local message count
+      // The backend will handle the actual database update
+      setMessagesUsed(prev => prev + 1);
       
-      // Increment message count
-      if (!userId) {
-        // Guest user - update the count
-        const guestId = getGuestId();
-        if (guestId) {
-          // Update guest message count in database
-          await supabase.from('user_limits')
-            .upsert({
-              guest_id: guestId,
-              messages_used: messagesUsed + 1,
-              messages_limit: MAX_FREE_MESSAGES
-            }, {
-              onConflict: 'guest_id'
-            });
-          
-          setMessagesUsed(prev => prev + 1);
-        } else {
-          console.error("No guest ID found when updating message count");
-        }
-      } else {
-        // Reload message usage count if user is logged in
-        await checkSubscriptionStatus();
-      }
+      // Reload message usage count to make sure it's in sync with the backend
+      await checkSubscriptionStatus();
       
     } catch (error) {
       toast.error("Failed to get a response. Please try again.");
