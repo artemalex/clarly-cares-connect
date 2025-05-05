@@ -15,7 +15,20 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, isInitial = false, conversation_id, guest_id, user_id } = await req.json();
+    const { messages, isInitial = false, conversation_id, guest_id, user_id, mode } = await req.json();
+    
+    if (!conversation_id) {
+      return new Response(
+        JSON.stringify({ error: "Missing conversation_id" }),
+        {
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json"
+          },
+          status: 400
+        }
+      );
+    }
     
     // Create a Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
@@ -29,33 +42,15 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY is not set");
     }
 
-    // Create a new conversation if this is the initial message and no conversation_id is provided
-    let activeConversationId = conversation_id;
-    let activeGuestId = guest_id;
-
-    if (isInitial && !activeConversationId) {
-      // Generate a new guest ID if not provided
-      if (!activeGuestId && !user_id) {
-        activeGuestId = crypto.randomUUID();
-      }
-
-      // Create a new conversation
-      const { data: conversationData, error: conversationError } = await supabase
-        .from('conversations')
-        .insert({
-          user_id: user_id || null,
-          guest_id: activeGuestId || null,
-          title: "New Conversation",
-          mode: "slow" // Default mode
-        })
-        .select('id')
-        .single();
-
-      if (conversationError) {
-        throw new Error(`Failed to create conversation: ${conversationError.message}`);
-      }
-
-      activeConversationId = conversationData.id;
+    // Check if the conversation exists
+    const { data: conversationData, error: conversationError } = await supabase
+      .from('conversations')
+      .select('*')
+      .eq('id', conversation_id)
+      .single();
+    
+    if (conversationError) {
+      throw new Error(`Conversation not found: ${conversationError.message}`);
     }
 
     // Format for the OpenAI API
@@ -64,11 +59,15 @@ serve(async (req) => {
       content: msg.content
     }));
 
-    // If it's an initial message, add a hidden prompt to start the conversation
+    // If it's an initial message, add a system prompt based on the mode
     if (isInitial) {
-      openaiMessages.push({
-        role: "user",
-        content: "Hello, I'm here for some guidance. Can you introduce yourself and ask me how I'm feeling today?"
+      const systemPrompt = mode === 'vent' 
+        ? "You are an empathetic friend. Listen without judgment, validate feelings, and offer support rather than solutions. Be warm, understanding, and conversational. Start by asking how the person is feeling today."
+        : "You are a thoughtful therapist with expertise in cognitive behavioral therapy. Help people reflect on their thoughts, feelings, and behaviors in a compassionate way. Ask insightful questions to guide deeper reflection. Start by asking how the person is feeling today.";
+      
+      openaiMessages.unshift({
+        role: "system",
+        content: systemPrompt
       });
     }
 
@@ -95,53 +94,51 @@ serve(async (req) => {
 
     const message = data.choices[0].message.content;
 
-    // If this is a new conversation, store the AI message in the database
-    if (isInitial && activeConversationId) {
-      await supabase
-        .from('chat_messages')
-        .insert({
-          conversation_id: activeConversationId,
-          user_id: user_id || null,
-          guest_id: activeGuestId || null,
-          role: 'assistant',
-          content: message
-        });
+    // Store the message in the database
+    await supabase
+      .from('chat_messages')
+      .insert({
+        conversation_id,
+        user_id: user_id || null,
+        guest_id: guest_id || null,
+        role: 'assistant',
+        content: message
+      });
 
-      // Update user_limits if needed
-      if (user_id || activeGuestId) {
-        // Check if user_limits record exists
-        const { data: limitsData } = await supabase
+    // Update user_limits if needed
+    if (user_id || guest_id) {
+      // Check if user_limits record exists
+      const { data: limitsData } = await supabase
+        .from('user_limits')
+        .select('*')
+        .or(`user_id.eq.${user_id ? user_id : null},guest_id.eq.${guest_id ? `'${guest_id}'` : null}`)
+        .maybeSingle();
+
+      if (limitsData) {
+        // Update existing record
+        await supabase
           .from('user_limits')
-          .select('*')
-          .or(`user_id.eq.${user_id ? user_id : null},guest_id.eq.${activeGuestId ? `'${activeGuestId}'` : null}`)
-          .maybeSingle();
-
-        if (limitsData) {
-          // Update existing record
-          await supabase
-            .from('user_limits')
-            .update({
-              messages_used: limitsData.messages_used + 1
-            })
-            .match(user_id ? { user_id } : { guest_id: activeGuestId });
-        } else {
-          // Create new record
-          await supabase
-            .from('user_limits')
-            .insert({
-              user_id: user_id || null,
-              guest_id: activeGuestId || null,
-              messages_used: 1
-            });
-        }
+          .update({
+            messages_used: limitsData.messages_used + 1
+          })
+          .match(user_id ? { user_id } : { guest_id });
+      } else {
+        // Create new record
+        await supabase
+          .from('user_limits')
+          .insert({
+            user_id: user_id || null,
+            guest_id: guest_id || null,
+            messages_used: 1
+          });
       }
     }
 
     return new Response(
       JSON.stringify({ 
         message,
-        conversation_id: activeConversationId,
-        guest_id: activeGuestId
+        conversation_id,
+        guest_id
       }),
       {
         headers: {

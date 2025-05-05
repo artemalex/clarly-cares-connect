@@ -26,14 +26,41 @@ export async function sendMessageToAPI(
     const user_id = session?.session?.user?.id;
     const guest_id = getGuestId();
     
-    // Call the chat function with appropriate parameters
+    let activeConversationId = conversationId;
+    
+    // If there's no conversation ID yet, create one first
+    if (!activeConversationId) {
+      // Create a new conversation using send-conversation edge function
+      const response = await supabase.functions.invoke("send-conversation", {
+        body: {
+          guest_id: guest_id,
+          title: "New Conversation",
+          mode: mode
+        }
+      });
+      
+      if (response.error) {
+        console.error("Failed to create conversation:", response.error);
+        throw new Error("Failed to create conversation");
+      }
+      
+      if (response.data && response.data.conversationId) {
+        activeConversationId = response.data.conversationId;
+        localStorage.setItem("conversation_id", activeConversationId);
+      } else {
+        throw new Error("No conversation ID returned from server");
+      }
+    }
+    
+    // Now call the chat function with the conversation ID
     const { data, error } = await supabase.functions.invoke('chat', {
       body: { 
         messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
         user_id,
         guest_id,
-        conversation_id: conversationId,
-        mode
+        conversation_id: activeConversationId,
+        mode,
+        isInitial: messages.length === 0
       }
     });
     
@@ -61,7 +88,7 @@ export async function sendMessageToAPI(
       success: true, 
       userMessage, 
       assistantMessage,
-      conversationId: data.conversation_id || conversationId
+      conversationId: data.conversation_id || activeConversationId
     };
     
   } catch (error) {

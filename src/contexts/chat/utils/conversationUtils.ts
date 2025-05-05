@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
@@ -103,13 +104,42 @@ export async function generateInitialMessage(conversationId: string, mode: Messa
     const { data: session } = await supabase.auth.getSession();
     const user_id = session?.session?.user?.id;
     const guest_id = getGuestId();
+    
+    let activeConversationId = conversationId;
+    
+    // If there's no conversation ID, create one first
+    if (!activeConversationId) {
+      // Create a new conversation using send-conversation edge function
+      const response = await supabase.functions.invoke("send-conversation", {
+        body: {
+          guest_id: guest_id,
+          title: "New Conversation",
+          mode: mode
+        }
+      });
+      
+      if (response.error) {
+        console.error("Failed to create conversation:", response.error);
+        throw new Error("Failed to create conversation");
+      }
+      
+      if (response.data && response.data.conversationId) {
+        activeConversationId = response.data.conversationId;
+        localStorage.setItem("conversation_id", activeConversationId);
+      } else {
+        throw new Error("No conversation ID returned from server");
+      }
+    }
 
-    // Call the edge function with the simplified approach
+    // Call the chat function with the proper conversation ID
     const { data, error } = await supabase.functions.invoke('chat', {
       body: { 
         messages: [],
-        mode: mode,
-        guest_id: guest_id
+        user_id,
+        guest_id,
+        conversation_id: activeConversationId,
+        mode,
+        isInitial: true
       }
     });
 
@@ -135,7 +165,7 @@ export async function generateInitialMessage(conversationId: string, mode: Messa
     return {
       success: true,
       message,
-      conversationId: data.conversation_id || conversationId
+      conversationId: data.conversation_id || activeConversationId
     };
   } catch (error) {
     console.error("Error generating initial message:", error);
