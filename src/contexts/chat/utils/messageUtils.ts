@@ -26,9 +26,6 @@ export async function sendMessageToAPI(
     const user_id = session?.session?.user?.id;
     const guest_id = getGuestId();
     
-    // Determine if this is an initial message (no messages and no conversation ID)
-    const isInitial = messages.length === 0 && !conversationId;
-    
     // Call the chat function with appropriate parameters
     const { data, error } = await supabase.functions.invoke('chat', {
       body: { 
@@ -36,7 +33,6 @@ export async function sendMessageToAPI(
         user_id,
         guest_id,
         conversation_id: conversationId,
-        isInitial,
         mode
       }
     });

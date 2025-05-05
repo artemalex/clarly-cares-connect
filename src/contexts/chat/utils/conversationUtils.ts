@@ -104,14 +104,12 @@ export async function generateInitialMessage(conversationId: string, mode: Messa
     const user_id = session?.session?.user?.id;
     const guest_id = getGuestId();
 
-    // Call the edge function to generate an initial message
+    // Call the edge function with the simplified approach
     const { data, error } = await supabase.functions.invoke('chat', {
       body: { 
-        messages: [], 
-        isInitial: true,
-        user_id,
-        guest_id,
-        conversation_id: conversationId
+        messages: [],
+        mode: mode,
+        guest_id: guest_id
       }
     });
 
