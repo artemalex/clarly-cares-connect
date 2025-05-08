@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -22,16 +23,19 @@ const ChatModeSelector = ({
       console.log('Mode selector opened');
     }
   }, [isOpen]);
+  
   const handleConfirm = () => {
     console.log('Confirming mode selection:', selectedMode);
     onSelectMode(selectedMode);
   };
+  
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       console.log('Dialog closed via UI interaction');
       onClose();
     }
   };
+  
   return <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -64,8 +68,8 @@ const ChatModeSelector = ({
               
               <div className="mt-2">
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
-                  <li>Unpack what you’re feeling, one layer at a time</li>
-                  <li>Gently spot what’s behind the patterns</li>
+                  <li>Unpack what you're feeling, one layer at a time</li>
+                  <li>Gently spot what's behind the patterns</li>
                   <li>Go deeper with someone who really listens</li>
                 </ul>
               </div>

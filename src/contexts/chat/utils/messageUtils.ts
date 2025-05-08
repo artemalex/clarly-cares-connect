@@ -23,11 +23,12 @@ export async function sendMessageToAPI(
     if (!activeConversationId) {
       // Create a new conversation using send-conversation edge function
       try {
+        console.log("Creating new conversation with mode:", mode);
         const response = await supabase.functions.invoke("send-conversation", {
           body: {
             guest_id: guest_id,
             title: "New Conversation",
-            mode: mode
+            mode: mode // Ensure we're passing the correct mode from the parameter
           }
         });
         
@@ -56,7 +57,7 @@ export async function sendMessageToAPI(
           user_id,
           guest_id,
           conversation_id: activeConversationId,
-          mode,
+          mode, // Ensure we're passing the mode parameter directly
           isInitial: messages.length === 0
         }
       });

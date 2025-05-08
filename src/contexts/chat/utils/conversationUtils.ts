@@ -69,7 +69,7 @@ export async function createConversation(mode: MessageMode, userId?: string, gue
     // Create conversation data
     const conversationData: any = {
       id: newConversationId,
-      mode,
+      mode, // Make sure we're using the passed mode parameter
       title: "New Conversation" // Default title, can be updated later
     };
     
@@ -81,6 +81,8 @@ export async function createConversation(mode: MessageMode, userId?: string, gue
     } else {
       return { success: false };
     }
+    
+    console.log("Creating conversation with mode:", mode);
     
     // Insert the conversation
     const { error } = await supabase.from('conversations').insert(conversationData);
@@ -110,11 +112,12 @@ export async function generateInitialMessage(conversationId: string, mode: Messa
     // If there's no conversation ID, create one first
     if (!activeConversationId) {
       // Create a new conversation using send-conversation edge function
+      console.log("Creating new conversation for initial message with mode:", mode);
       const response = await supabase.functions.invoke("send-conversation", {
         body: {
           guest_id: guest_id,
           title: "New Conversation",
-          mode: mode
+          mode: mode // Make sure to pass the mode parameter correctly
         }
       });
       
@@ -132,13 +135,14 @@ export async function generateInitialMessage(conversationId: string, mode: Messa
     }
 
     // Call the chat function with the proper conversation ID
+    console.log("Calling chat function with mode:", mode);
     const { data, error } = await supabase.functions.invoke('chat', {
       body: { 
         messages: [],
         user_id,
         guest_id,
         conversation_id: activeConversationId,
-        mode,
+        mode, // Make sure to pass the mode parameter correctly
         isInitial: true
       }
     });

@@ -40,6 +40,7 @@ export function useConversationManagement() {
   
   // Save mode to localStorage whenever it changes
   useEffect(() => {
+    console.log("Setting mode in localStorage:", mode);
     localStorage.setItem("clarlyMode", mode);
   }, [mode]);
 
@@ -79,13 +80,15 @@ export function useConversationManagement() {
         guestId = ensureGuestId();
       }
       
+      console.log("Starting new chat with mode:", mode);
+      
       // Direct invocation of the send-conversation edge function
       if (!userId && guestId) {
         const response = await supabase.functions.invoke("send-conversation", {
           body: {
             guest_id: guestId,
             title: "New Conversation",
-            mode
+            mode // Use the current mode from state
           }
         });
         
@@ -135,6 +138,7 @@ export function useConversationManagement() {
     
     setIsLoading(true);
     try {
+      console.log("Generating first message with mode:", mode);
       const result = await generateInitialMessage(newConversationId, mode);
       
       if (!result.success) {
