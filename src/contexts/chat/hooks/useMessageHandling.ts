@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
 import { sendMessageToAPI } from "../utils/messageUtils";
@@ -53,6 +54,18 @@ export function useMessageHandling(
       }
     }
 
+    // Create user message object for immediate display
+    const userMessageId = uuidv4();
+    const userMessage: Message = {
+      id: userMessageId,
+      role: "user",
+      content,
+      timestamp: new Date()
+    };
+    
+    // Immediately update UI with user message
+    setMessages(prevMessages => [...prevMessages, userMessage]);
+
     // Update loading state
     setIsLoading(true);
     
@@ -70,8 +83,8 @@ export function useMessageHandling(
         setConversationId(result.conversationId);
       }
       
-      // Update local state with user message and AI response
-      setMessages(prevMessages => [...prevMessages, result.userMessage, result.assistantMessage]);
+      // Update local state with just the assistant response (user message already added)
+      setMessages(prevMessages => [...prevMessages, result.assistantMessage]);
       
       // For all users (both logged in and guest), increment the local message count
       // The backend will handle the actual database update
