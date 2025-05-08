@@ -12,15 +12,6 @@ export async function sendMessageToAPI(
   conversationId: string | null
 ) {
   try {
-    // Create user message object for local state
-    const messageId = uuidv4();
-    const userMessage: Message = {
-      id: messageId,
-      role: "user",
-      content,
-      timestamp: new Date(),
-    };
-    
     // Check if user is logged in or guest
     const { data: session } = await supabase.auth.getSession();
     const user_id = session?.session?.user?.id;
@@ -31,65 +22,79 @@ export async function sendMessageToAPI(
     // If there's no conversation ID yet, create one first
     if (!activeConversationId) {
       // Create a new conversation using send-conversation edge function
-      const response = await supabase.functions.invoke("send-conversation", {
-        body: {
-          guest_id: guest_id,
-          title: "New Conversation",
-          mode: mode
+      try {
+        const response = await supabase.functions.invoke("send-conversation", {
+          body: {
+            guest_id: guest_id,
+            title: "New Conversation",
+            mode: mode
+          }
+        });
+        
+        if (response.error) {
+          console.error("Failed to create conversation:", response.error);
+          throw new Error("Failed to create conversation");
         }
-      });
-      
-      if (response.error) {
-        console.error("Failed to create conversation:", response.error);
-        throw new Error("Failed to create conversation");
-      }
-      
-      if (response.data && response.data.conversationId) {
-        activeConversationId = response.data.conversationId;
-        localStorage.setItem("conversation_id", activeConversationId);
-      } else {
-        throw new Error("No conversation ID returned from server");
+        
+        if (response.data && response.data.conversationId) {
+          activeConversationId = response.data.conversationId;
+          localStorage.setItem("conversation_id", activeConversationId);
+        } else {
+          throw new Error("No conversation ID returned from server");
+        }
+      } catch (err) {
+        console.error("Error creating conversation:", err);
+        throw new Error("Failed to create conversation. Please try again.");
       }
     }
     
     // Now call the chat function with the conversation ID
-    const { data, error } = await supabase.functions.invoke('chat', {
-      body: { 
-        messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
-        user_id,
-        guest_id,
-        conversation_id: activeConversationId,
-        mode,
-        isInitial: messages.length === 0
+    try {
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: { 
+          messages: [...messages, { role: "user", content }].map(({ role, content }) => ({ role, content })),
+          user_id,
+          guest_id,
+          conversation_id: activeConversationId,
+          mode,
+          isInitial: messages.length === 0
+        }
+      });
+      
+      if (error) throw error;
+      
+      // It should return the assistant's message
+      if (!data || !data.message) {
+        throw new Error("Invalid response from server");
       }
-    });
-    
-    if (error) throw error;
-    
-    const assistantMessageId = uuidv4();
-    const assistantMessage: Message = {
-      id: assistantMessageId,
-      role: "assistant",
-      content: data.message,
-      timestamp: new Date()
-    };
-
-    // Update the conversation_id in localStorage if it was provided in the response
-    if (data.conversation_id) {
-      localStorage.setItem("conversation_id", data.conversation_id);
+      
+      const assistantMessageId = uuidv4();
+      const assistantMessage: Message = {
+        id: assistantMessageId,
+        role: "assistant",
+        content: data.message,
+        timestamp: new Date()
+      };
+  
+      // Update the conversation_id in localStorage if it was provided in the response
+      if (data.conversation_id) {
+        localStorage.setItem("conversation_id", data.conversation_id);
+      }
+      
+      // Update the guest_id in localStorage if it was provided in the response
+      if (data.guest_id) {
+        localStorage.setItem("guest_id", data.guest_id);
+      }
+  
+      return { 
+        success: true, 
+        assistantMessage,
+        conversationId: data.conversation_id || activeConversationId
+      };
+    } catch (err) {
+      console.error("Error calling chat function:", err);
+      throw err;
     }
-    
-    // Update the guest_id in localStorage if it was provided in the response
-    if (data.guest_id) {
-      localStorage.setItem("guest_id", data.guest_id);
-    }
-
-    return { 
-      success: true, 
-      userMessage, 
-      assistantMessage,
-      conversationId: data.conversation_id || activeConversationId
-    };
     
   } catch (error) {
     console.error("Error in sendMessageToAPI:", error);
