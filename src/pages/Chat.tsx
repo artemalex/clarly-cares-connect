@@ -12,7 +12,7 @@ import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
 
 const Chat = () => {
-  const { remainingMessages, startNewChat, messages, setMode, mode } = useChatContext();
+  const { remainingMessages, startNewChat, messages, setMode } = useChatContext();
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
   const { id } = useParams<{ id?: string }>();
@@ -50,7 +50,6 @@ const Chat = () => {
   };
 
   const handleSelectMode = (mode: MessageMode) => {
-    console.log(`Chat.tsx: Mode selected: ${mode}`);
     setMode(mode);
     setModeSelectorOpen(false);
     startNewChat();

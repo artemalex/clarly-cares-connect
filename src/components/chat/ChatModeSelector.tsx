@@ -5,13 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Clock, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MessageMode } from "@/contexts/chat";
-
 interface ChatModeSelectorProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectMode: (mode: MessageMode) => void;
 }
-
 const ChatModeSelector = ({
   isOpen,
   onClose,
@@ -22,14 +20,7 @@ const ChatModeSelector = ({
   // Reset selected mode when the dialog opens
   useEffect(() => {
     if (isOpen) {
-      // Load saved mode from localStorage if available
-      const savedMode = localStorage.getItem("clarlyMode");
-      if (savedMode === "slow" || savedMode === "vent") {
-        setSelectedMode(savedMode);
-      } else {
-        setSelectedMode("slow");
-      }
-      console.log('Mode selector opened, starting with mode:', savedMode || "slow");
+      console.log('Mode selector opened');
     }
   }, [isOpen]);
   
@@ -45,23 +36,20 @@ const ChatModeSelector = ({
     }
   };
   
-  return (
-    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
+  return <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">Pick the mode that fits your mood</DialogTitle>
+          
         </DialogHeader>
         
         <div className="flex flex-col gap-4 py-4">
-          <button 
-            onClick={() => setSelectedMode("vent")} 
-            className={cn(
-              "flex items-start gap-3 p-4 rounded-lg border transition-all", 
-              selectedMode === "vent" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-            )}
-          >
+          <button onClick={() => setSelectedMode("vent")} className={cn("flex items-start gap-3 p-4 rounded-lg border transition-all", selectedMode === "vent" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50")}>
+            
             <div className="text-left">
               <h3 className="font-medium">🔥 Vent Mode</h3>
+              
+              
               <div className="mt-2">
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
                   <li>Let it all out, just as it is</li>
@@ -72,15 +60,12 @@ const ChatModeSelector = ({
             </div>
           </button>
           
-          <button 
-            onClick={() => setSelectedMode("slow")} 
-            className={cn(
-              "flex items-start gap-3 p-4 rounded-lg border transition-all", 
-              selectedMode === "slow" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-            )}
-          >
+          <button onClick={() => setSelectedMode("slow")} className={cn("flex items-start gap-3 p-4 rounded-lg border transition-all", selectedMode === "slow" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50")}>
+            
             <div className="text-left">
               <h3 className="font-medium">🧠 Reflect Mode</h3>
+              
+              
               <div className="mt-2">
                 <ul className="text-xs list-disc list-inside mt-1 text-muted-foreground">
                   <li>Unpack what you're feeling, one layer at a time</li>
@@ -98,8 +83,6 @@ const ChatModeSelector = ({
           </Button>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default ChatModeSelector;
