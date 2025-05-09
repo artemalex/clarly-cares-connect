@@ -1,9 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Mic, MicOff, Send, X, RotateCcw, Check, AudioWaveform } from 'lucide-react';
+import { Mic, MicOff, Send, X, RotateCcw, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -26,8 +25,6 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  // Array of bar heights for the waveform visualization
-  const [waveformBars, setWaveformBars] = useState<number[]>(Array(30).fill(2));
 
   // Start recording automatically when component mounts
   useEffect(() => {
@@ -61,17 +58,6 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     const normalizedLevel = Math.min(1, average / 128); // Normalize between 0 and 1
     
     setAudioLevel(normalizedLevel);
-
-    // Update waveform bars with smoothing
-    setWaveformBars(prevBars => {
-      // Create a new array with updated heights
-      return prevBars.map((height, index) => {
-        // Generate random height influenced by audio level
-        const targetHeight = normalizedLevel * 24 * (0.2 + Math.random() * 0.8);
-        // Apply smoothing - move 30% toward the target height
-        return height + (targetHeight - height) * 0.3;
-      });
-    });
     
     // Detect silence (to auto-stop recording after 10 seconds)
     if (isRecording) {
@@ -273,21 +259,17 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             )}
           </div>
           
-          {/* New ChatGPT-style waveform animation */}
           {isRecording && (
-            <div className="relative mb-6 flex items-center justify-center h-20 w-64">
-              <div className="flex items-end space-x-1 h-16">
-                {waveformBars.map((height, index) => (
-                  <div
-                    key={index}
-                    className="w-1.5 bg-primary rounded-full transition-all duration-100 ease-in-out"
-                    style={{ 
-                      height: `${Math.max(2, height)}px`,
-                      opacity: isRecording ? 0.7 + (height / 40) : 0.5
-                    }}
-                  ></div>
-                ))}
-              </div>
+            <div className="relative mb-6 h-16 w-48">
+              <svg width="100%" height="100%" className="absolute">
+                <polyline
+                  points={generateWaveformPoints()}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="text-primary animate-pulse"
+                />
+              </svg>
             </div>
           )}
           
@@ -334,4 +316,3 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 };
 
 export default VoiceRecorder;
-

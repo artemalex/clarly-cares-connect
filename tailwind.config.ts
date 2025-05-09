@@ -143,11 +143,6 @@ export default {
 				'pulse-gentle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.8' }
-				},
-				'waveform-movement': {
-					'0%': { transform: 'scaleY(0.5)' },
-					'50%': { transform: 'scaleY(1.2)' },
-					'100%': { transform: 'scaleY(0.5)' }
 				}
 			},
 			animation: {
@@ -155,8 +150,7 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
 				'fade-up': 'fade-up 0.5s ease-out',
-				'pulse-gentle': 'pulse-gentle 2s ease-in-out infinite',
-				'waveform-movement': 'waveform-movement 1.2s ease-in-out infinite'
+				'pulse-gentle': 'pulse-gentle 2s ease-in-out infinite'
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
@@ -167,4 +161,3 @@ export default {
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
