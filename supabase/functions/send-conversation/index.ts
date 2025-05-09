@@ -22,6 +22,14 @@ serve(async (req) => {
       throw new Error('Missing required parameter: mode');
     }
 
+    console.log(`Creating conversation with mode: ${mode}`);
+    
+    // Make sure mode is valid
+    if (mode !== "slow" && mode !== "vent") {
+      console.error(`Invalid mode received: ${mode}`);
+      throw new Error('Invalid mode: must be "slow" or "vent"');
+    }
+
     // Create a Supabase client with the Supabase URL and key
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -44,6 +52,8 @@ serve(async (req) => {
       console.error('Error creating conversation:', error);
       throw error;
     }
+
+    console.log(`Conversation created with ID: ${conversationId} and mode: ${mode}`);
 
     return new Response(
       JSON.stringify({

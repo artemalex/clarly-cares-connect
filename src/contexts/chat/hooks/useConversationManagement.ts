@@ -88,7 +88,7 @@ export function useConversationManagement() {
           body: {
             guest_id: guestId,
             title: "New Conversation",
-            mode // Use the current mode from state
+            mode: mode // Use the current mode from state
           }
         });
         
@@ -101,6 +101,7 @@ export function useConversationManagement() {
         if (response.data && response.data.conversationId) {
           setConversationId(response.data.conversationId);
           setMessages([]);
+          localStorage.setItem("conversation_id", response.data.conversationId);
           
           if (!isInitial) {
             await generateFirstMessage(response.data.conversationId);
@@ -115,6 +116,7 @@ export function useConversationManagement() {
         // Update state with the new conversation ID
         setConversationId(result.conversationId);
         setMessages([]);
+        localStorage.setItem("conversation_id", result.conversationId);
         
         // Update URL for logged in users
         if (userId) {
