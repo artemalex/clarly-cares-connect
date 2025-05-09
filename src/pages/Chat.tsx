@@ -61,7 +61,7 @@ const Chat = () => {
       className="flex flex-col min-h-[calc(100vh-64px)]"
     >
       {/* Add keyframes for the waveform animation */}
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes pulse {
           0% { opacity: 0.6; }
           50% { opacity: 1; }
@@ -86,7 +86,7 @@ const Chat = () => {
         .animate-fade-in {
           animation: fade-in 0.3s ease-out;
         }
-      `}</style>
+      `}} />
       
       <div className="container py-4 sm:py-6 px-2 sm:px-4 flex flex-col flex-1">
         <div className="max-w-4xl mx-auto w-full flex flex-col flex-1">
