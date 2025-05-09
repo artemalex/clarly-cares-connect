@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,14 +26,23 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  // Clean up animation frame on component unmount
+  // Start recording automatically when component mounts
   useEffect(() => {
+    if (!disabled) {
+      startRecording();
+    }
+    
+    // Clean up animation frame and recording on component unmount
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
       if (silenceTimeoutRef.current) {
         clearTimeout(silenceTimeoutRef.current);
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+        mediaRecorderRef.current.stop();
+        mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       }
     };
   }, []);
@@ -247,7 +255,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             ) : isRecording ? (
               <p className="text-primary font-medium">Recording... speak freely</p>
             ) : (
-              <p className="text-muted-foreground">Tap the microphone to start</p>
+              <p className="text-muted-foreground">Starting recording...</p>
             )}
           </div>
           

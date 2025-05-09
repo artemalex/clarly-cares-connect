@@ -112,7 +112,7 @@ const ChatInput = () => {
                     type="button" 
                     variant={micHovered ? "default" : "outline"} 
                     size="icon"
-                    onClick={() => setIsRecording(true)}
+                    onClick={() => setIsRecording(true)} // This immediately opens the dialog, which auto-starts recording
                     onMouseEnter={() => setMicHovered(true)}
                     onMouseLeave={() => setMicHovered(false)}
                     disabled={isLoading || remainingMessages <= 0}
