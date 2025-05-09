@@ -60,6 +60,34 @@ const Chat = () => {
       ref={pageRef}
       className="flex flex-col min-h-[calc(100vh-64px)]"
     >
+      {/* Add keyframes for the waveform animation */}
+      <style jsx global>{`
+        @keyframes pulse {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
+        }
+        .animate-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes scale-in {
+          0% { transform: scale(0.9); }
+          100% { transform: scale(1.1); }
+        }
+        .animate-scale-in {
+          animation: scale-in 0.3s ease-out forwards;
+        }
+        
+        @keyframes fade-in {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+      `}</style>
+      
       <div className="container py-4 sm:py-6 px-2 sm:px-4 flex flex-col flex-1">
         <div className="max-w-4xl mx-auto w-full flex flex-col flex-1">
           <div className={cn(

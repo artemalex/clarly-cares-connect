@@ -14,6 +14,7 @@ const ChatInput = () => {
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [micHovered, setMicHovered] = useState(false);
   const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isMobile = useIsMobile();
@@ -109,13 +110,18 @@ const ChatInput = () => {
                 <TooltipTrigger asChild>
                   <Button 
                     type="button" 
-                    variant="outline" 
+                    variant={micHovered ? "default" : "outline"} 
                     size="icon"
                     onClick={() => setIsRecording(true)}
+                    onMouseEnter={() => setMicHovered(true)}
+                    onMouseLeave={() => setMicHovered(false)}
                     disabled={isLoading || remainingMessages <= 0}
-                    className="rounded-full h-8 w-8 flex-shrink-0"
+                    className={cn(
+                      "rounded-full h-8 w-8 flex-shrink-0 transition-colors duration-300",
+                      micHovered && "bg-primary text-primary-foreground"
+                    )}
                   >
-                    <Mic className="h-4 w-4" />
+                    <Mic className={cn("h-4 w-4", micHovered && "animate-scale-in")} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
