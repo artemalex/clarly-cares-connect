@@ -57,7 +57,7 @@ export async function sendMessageToAPI(
           user_id,
           guest_id,
           conversation_id: activeConversationId,
-          mode, // Ensure we're passing the mode parameter directly
+          mode: mode, // Ensure we're passing the mode parameter directly
           isInitial: messages.length === 0
         }
       });

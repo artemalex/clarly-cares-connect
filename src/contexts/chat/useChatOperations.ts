@@ -82,9 +82,9 @@ export function useChatOperations() {
     conversationId,
     setMode,
     sendMessage,
-    startNewChat,
+    startNewChat: (isInitial = false) => startNewChat(isInitial, mode),
     checkSubscriptionStatus,
     loadConversation: loadConversationData,
-    generateInitialMessage: generateFirstMessage
+    generateInitialMessage: (conversationId: string) => generateFirstMessage(conversationId, mode)
   };
 }

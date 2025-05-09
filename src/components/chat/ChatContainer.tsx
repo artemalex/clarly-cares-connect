@@ -10,16 +10,17 @@ import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
 
 const ChatContainer = () => {
-  const { isLoading, setMode, startNewChat, messages } = useChatContext();
+  const { isLoading, setMode, startNewChat, messages, mode } = useChatContext();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showModeSelector, setShowModeSelector] = useState(false);
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleSelectMode = (mode: MessageMode) => {
-    setMode(mode);
+  const handleSelectMode = (selectedMode: MessageMode) => {
+    console.log('Mode selected in ChatContainer:', selectedMode);
+    setMode(selectedMode);
     setShowModeSelector(false);
-    startNewChat();
+    startNewChat(false, selectedMode);
   };
 
   return (
@@ -43,6 +44,7 @@ const ChatContainer = () => {
         isOpen={showModeSelector}
         onClose={() => setShowModeSelector(false)}
         onSelectMode={handleSelectMode}
+        initialMode={mode}
       />
     </>
   );

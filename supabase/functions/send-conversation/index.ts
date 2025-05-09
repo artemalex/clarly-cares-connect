@@ -18,8 +18,8 @@ serve(async (req) => {
       throw new Error('Missing required parameter: guest_id');
     }
     
-    if (!mode) {
-      throw new Error('Missing required parameter: mode');
+    if (!mode || (mode !== 'slow' && mode !== 'vent')) {
+      throw new Error('Invalid or missing mode parameter: mode must be "slow" or "vent"');
     }
 
     // Create a Supabase client with the Supabase URL and key
@@ -29,6 +29,8 @@ serve(async (req) => {
 
     // Generate UUID for conversation
     const conversationId = crypto.randomUUID();
+
+    console.log(`Creating conversation with ID ${conversationId}, mode: ${mode}, guest_id: ${guest_id}`);
 
     // Insert the conversation into the database
     const { error } = await supabase
@@ -44,6 +46,8 @@ serve(async (req) => {
       console.error('Error creating conversation:', error);
       throw error;
     }
+
+    console.log(`Successfully created conversation ${conversationId} with mode ${mode}`);
 
     return new Response(
       JSON.stringify({

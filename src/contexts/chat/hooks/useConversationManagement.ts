@@ -44,6 +44,26 @@ export function useConversationManagement() {
     localStorage.setItem("clarlyMode", mode);
   }, [mode]);
 
+  // Update the conversation's mode in the database when it changes
+  useEffect(() => {
+    if (conversationId && mode) {
+      console.log(`Updating conversation ${conversationId} mode to ${mode} in database`);
+      
+      // Update the mode in the database
+      supabase
+        .from('conversations')
+        .update({ mode })
+        .eq('id', conversationId)
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error updating conversation mode:", error);
+          } else {
+            console.log("Conversation mode updated successfully");
+          }
+        });
+    }
+  }, [mode, conversationId]);
+
   // Load a conversation by ID
   const loadConversationData = async (id: string) => {
     try {
@@ -69,7 +89,7 @@ export function useConversationManagement() {
   };
 
   // Start a new chat conversation
-  const startNewChat = async (isInitial = false) => {
+  const startNewChat = async (isInitial = false, selectedMode?: MessageMode) => {
     try {
       const session = await supabase.auth.getSession();
       const userId = session.data.session?.user?.id;
@@ -80,7 +100,9 @@ export function useConversationManagement() {
         guestId = ensureGuestId();
       }
       
-      console.log("Starting new chat with mode:", mode);
+      // Use the explicitly passed mode, or fall back to the current state
+      const modeToUse = selectedMode || mode;
+      console.log("Starting new chat with mode:", modeToUse);
       
       // Direct invocation of the send-conversation edge function
       if (!userId && guestId) {
@@ -88,7 +110,7 @@ export function useConversationManagement() {
           body: {
             guest_id: guestId,
             title: "New Conversation",
-            mode // Use the current mode from state
+            mode: modeToUse // Use the explicitly passed mode
           }
         });
         
@@ -103,13 +125,13 @@ export function useConversationManagement() {
           setMessages([]);
           
           if (!isInitial) {
-            await generateFirstMessage(response.data.conversationId);
+            await generateFirstMessage(response.data.conversationId, modeToUse);
           }
           return;
         }
       } else {
         // Create a new conversation for logged in users (using existing method)
-        const result = await createConversation(mode, userId, guestId);
+        const result = await createConversation(modeToUse, userId, guestId);
         if (!result.success) return;
         
         // Update state with the new conversation ID
@@ -123,7 +145,7 @@ export function useConversationManagement() {
         
         // If this isn't the initial call, generate the first message
         if (!isInitial) {
-          await generateFirstMessage(result.conversationId);
+          await generateFirstMessage(result.conversationId, modeToUse);
         }
       }
     } catch (error) {
@@ -133,13 +155,16 @@ export function useConversationManagement() {
   };
   
   // Generate the initial AI message
-  const generateFirstMessage = async (newConversationId: string) => {
+  const generateFirstMessage = async (newConversationId: string, selectedMode?: MessageMode) => {
     if (isLoading) return;
     
     setIsLoading(true);
     try {
-      console.log("Generating first message with mode:", mode);
-      const result = await generateInitialMessage(newConversationId, mode);
+      // Use the explicitly passed mode parameter or fall back to the current state
+      const modeToUse = selectedMode || mode;
+      console.log("Generating first message with mode:", modeToUse);
+      
+      const result = await generateInitialMessage(newConversationId, modeToUse);
       
       if (!result.success) {
         toast.error("Failed to start the conversation. Please try again.");

@@ -1,28 +1,32 @@
 
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Clock, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MessageMode } from "@/contexts/chat";
+
 interface ChatModeSelectorProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectMode: (mode: MessageMode) => void;
+  initialMode?: MessageMode;
 }
+
 const ChatModeSelector = ({
   isOpen,
   onClose,
-  onSelectMode
+  onSelectMode,
+  initialMode = "slow"
 }: ChatModeSelectorProps) => {
-  const [selectedMode, setSelectedMode] = useState<MessageMode>("slow");
+  const [selectedMode, setSelectedMode] = useState<MessageMode>(initialMode);
 
-  // Reset selected mode when the dialog opens
+  // Reset selected mode when the dialog opens, using the provided initialMode
   useEffect(() => {
     if (isOpen) {
-      console.log('Mode selector opened');
+      console.log('Mode selector opened, initial mode:', initialMode);
+      setSelectedMode(initialMode);
     }
-  }, [isOpen]);
+  }, [isOpen, initialMode]);
   
   const handleConfirm = () => {
     console.log('Confirming mode selection:', selectedMode);
