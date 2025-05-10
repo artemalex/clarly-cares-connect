@@ -17,18 +17,18 @@ const Home = () => {
     setMode,
     startNewChat
   } = useChatContext();
-  const [selectedMode, setSelectedMode] = useState<MessageMode>("slow");
+  const [selectedMode, setSelectedMode] = useState<MessageMode | null>(null);
   const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
   const navigate = useNavigate();
   
   // Track last click time to prevent double clicks
   const lastClickTimeRef = useRef<number>(0);
   
-  const handleStartChat = (mode: MessageMode) => {
+  const handleStartChat = useCallback((mode: MessageMode) => {
     setMode(mode);
-    startNewChat();
+    startNewChat(false, mode);
     navigate("/chat");
-  };
+  }, [setMode, startNewChat, navigate]);
   
   // Improved handler with debounce mechanism
   const handleOpenModeSelector = useCallback(() => {
@@ -46,7 +46,7 @@ const Home = () => {
   const handleSelectMode = (mode: MessageMode) => {
     setMode(mode);
     setModeSelectorOpen(false);
-    startNewChat();
+    startNewChat(false, mode);
     navigate("/chat");
   };
   
@@ -81,6 +81,7 @@ const Home = () => {
         isOpen={modeSelectorOpen}
         onClose={handleCloseModal}
         onSelectMode={handleSelectMode}
+        initialMode={null}
       />
     </div>
   );
