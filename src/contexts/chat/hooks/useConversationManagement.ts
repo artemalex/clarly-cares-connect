@@ -9,9 +9,9 @@ import { ensureGuestId, getGuestId } from "@/utils/guestUtils";
 
 export function useConversationManagement() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [mode, setMode] = useState<MessageMode>(() => {
+  const [mode, setMode] = useState<MessageMode | null>(() => {
     const savedMode = localStorage.getItem("clarlyMode");
-    return (savedMode === "slow" || savedMode === "vent") ? savedMode : "slow";
+    return (savedMode === "slow" || savedMode === "vent") ? savedMode : null;
   });
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -38,31 +38,38 @@ export function useConversationManagement() {
     }
   })();
   
-  // Save mode to localStorage whenever it changes
+  // Save mode to localStorage ONLY when it changes and is not null
   useEffect(() => {
-    console.log("Setting mode in localStorage:", mode);
-    localStorage.setItem("clarlyMode", mode);
+    if (mode !== null) {
+      console.log("Setting mode in localStorage:", mode);
+      localStorage.setItem("clarlyMode", mode);
+    }
   }, [mode]);
 
-  // Update the conversation's mode in the database when it changes
+  // Update the conversation's mode in the database ONLY when it changes and we have a conversation
   useEffect(() => {
     if (conversationId && mode) {
-      console.log(`Updating conversation ${conversationId} mode to ${mode} in database`);
-      
-      // Update the mode in the database
-      supabase
-        .from('conversations')
-        .update({ mode })
-        .eq('id', conversationId)
-        .then(({ error }) => {
-          if (error) {
-            console.error("Error updating conversation mode:", error);
-          } else {
-            console.log("Conversation mode updated successfully");
-          }
-        });
+      updateConversationMode(mode);
     }
   }, [mode, conversationId]);
+
+  const updateConversationMode = async (selectedMode: MessageMode) => {
+    if (!conversationId || !selectedMode) return;
+    
+    console.log(`Updating conversation ${conversationId} mode to ${selectedMode} in database`);
+    
+    // Update the mode in the database
+    const { error } = await supabase
+      .from('conversations')
+      .update({ mode: selectedMode })
+      .eq('id', conversationId);
+      
+    if (error) {
+      console.error("Error updating conversation mode:", error);
+    } else {
+      console.log("Conversation mode updated successfully");
+    }
+  };
 
   // Load a conversation by ID
   const loadConversationData = async (id: string) => {
@@ -77,7 +84,9 @@ export function useConversationManagement() {
       }
       
       setConversationId(id);
-      setMode(result.conversation.mode as MessageMode);
+      if (result.conversation.mode) {
+        setMode(result.conversation.mode as MessageMode);
+      }
       setMessages(result.messages);
       
     } catch (error) {
@@ -88,9 +97,15 @@ export function useConversationManagement() {
     }
   };
 
-  // Start a new chat conversation
+  // Start a new chat conversation - don't automatically select a mode
   const startNewChat = async (isInitial = false, selectedMode?: MessageMode) => {
     try {
+      // Don't proceed if no mode is selected and one wasn't passed
+      if (!selectedMode && !mode) {
+        console.log("No mode selected yet, not starting chat");
+        return;
+      }
+      
       const session = await supabase.auth.getSession();
       const userId = session.data.session?.user?.id;
       let guestId = null;
@@ -129,7 +144,7 @@ export function useConversationManagement() {
           }
           return;
         }
-      } else {
+      } else if (modeToUse) {
         // Create a new conversation for logged in users (using existing method)
         const result = await createConversation(modeToUse, userId, guestId);
         if (!result.success) return;
@@ -157,6 +172,12 @@ export function useConversationManagement() {
   // Generate the initial AI message
   const generateFirstMessage = async (newConversationId: string, selectedMode?: MessageMode) => {
     if (isLoading) return;
+    
+    // Don't proceed if no mode is selected and one wasn't passed
+    if (!selectedMode && !mode) {
+      console.log("No mode selected yet, not generating first message");
+      return;
+    }
     
     setIsLoading(true);
     try {
@@ -193,5 +214,6 @@ export function useConversationManagement() {
     loadConversationData,
     startNewChat,
     generateFirstMessage,
+    updateConversationMode,
   };
 }

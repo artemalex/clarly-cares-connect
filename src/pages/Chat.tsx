@@ -12,7 +12,7 @@ import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
 
 const Chat = () => {
-  const { remainingMessages, startNewChat, messages, mode, setMode } = useChatContext();
+  const { remainingMessages, startNewChat, messages, mode, setMode, conversationId, updateConversationMode } = useChatContext();
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
   const { id } = useParams<{ id?: string }>();
@@ -51,11 +51,17 @@ const Chat = () => {
 
   const handleSelectMode = (selectedMode: MessageMode) => {
     console.log('Mode selected in Chat.tsx:', selectedMode);
-    // Pass the selected mode to update the context state
+    // Set the mode in context state
     setMode(selectedMode);
     setModeSelectorOpen(false);
-    // Pass the selected mode explicitly to startNewChat
-    startNewChat(false, selectedMode);
+    
+    // If there's no conversation yet, start a new one with selected mode
+    if (!conversationId) {
+      startNewChat(false, selectedMode);
+    } else {
+      // If we have an existing conversation, update its mode
+      updateConversationMode(selectedMode);
+    }
   };
   
   return (

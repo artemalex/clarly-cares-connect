@@ -26,7 +26,8 @@ export function useChatOperations() {
     urlConversationId,
     loadConversationData,
     startNewChat,
-    generateFirstMessage
+    generateFirstMessage,
+    updateConversationMode
   } = useConversationManagement();
   
   const { sendMessage } = useMessageHandling(
@@ -59,14 +60,10 @@ export function useChatOperations() {
         const savedId = localStorage.getItem("conversation_id");
         if (savedId) {
           await loadConversationData(savedId);
-        } else {
-          await startNewChat(true);
         }
+        // Do NOT auto-start a new chat here, wait for user interaction
       }
-      // If no conversation ID anywhere, start a new chat
-      else if (messages.length === 0 && !isLoading) {
-        await startNewChat(true);
-      }
+      // Do NOT auto-start a new chat, we need to wait for mode selection first
     };
     
     initializeChat();
@@ -82,9 +79,10 @@ export function useChatOperations() {
     conversationId,
     setMode,
     sendMessage,
-    startNewChat: (isInitial = false) => startNewChat(isInitial, mode),
+    startNewChat,
     checkSubscriptionStatus,
     loadConversation: loadConversationData,
-    generateInitialMessage: (conversationId: string) => generateFirstMessage(conversationId, mode)
+    generateInitialMessage: (conversationId: string) => generateFirstMessage(conversationId, mode),
+    updateConversationMode
   };
 }

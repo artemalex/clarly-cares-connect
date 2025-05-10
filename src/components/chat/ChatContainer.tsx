@@ -10,7 +10,7 @@ import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
 
 const ChatContainer = () => {
-  const { isLoading, setMode, startNewChat, messages, mode } = useChatContext();
+  const { isLoading, setMode, startNewChat, messages, mode, updateConversationMode, conversationId } = useChatContext();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showModeSelector, setShowModeSelector] = useState(false);
   const isMobile = useIsMobile();
@@ -20,7 +20,14 @@ const ChatContainer = () => {
     console.log('Mode selected in ChatContainer:', selectedMode);
     setMode(selectedMode);
     setShowModeSelector(false);
-    startNewChat(false, selectedMode);
+    
+    // Only start a new chat if we don't have an existing conversation
+    if (!conversationId) {
+      startNewChat(false, selectedMode);
+    } else {
+      // If we have an existing conversation, update its mode
+      updateConversationMode(selectedMode);
+    }
   };
 
   return (
