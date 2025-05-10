@@ -12,7 +12,7 @@ export interface Message {
 
 export interface ChatContextType {
   messages: Message[];
-  mode: MessageMode;
+  mode: MessageMode | null;
   messagesUsed: number;
   remainingMessages: number;
   isLoading: boolean;
@@ -20,6 +20,9 @@ export interface ChatContextType {
   conversationId: string | null;
   setMode: (mode: MessageMode) => void;
   sendMessage: (content: string) => void;
-  startNewChat: () => void;
+  startNewChat: (isInitial?: boolean, selectedMode?: MessageMode) => Promise<void>;
   checkSubscriptionStatus: () => Promise<void>;
+  loadConversation: (id: string) => Promise<void>;
+  generateInitialMessage: (conversationId: string) => Promise<void>;
+  updateConversationMode: (selectedMode: MessageMode) => Promise<void>;
 }
