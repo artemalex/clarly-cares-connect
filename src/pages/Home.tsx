@@ -1,10 +1,9 @@
+
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChatContext, MessageMode } from "@/contexts/chat";
 import StickyCTA from "@/components/ui/sticky-cta";
 import ChatModeSelector from "@/components/chat/ChatModeSelector";
-import { supabase } from "@/lib/supabase";
-import { toast } from "sonner";
 
 // Imported components
 import HeroSection from "@/components/home/HeroSection";
@@ -25,50 +24,26 @@ const Home = () => {
   // Track last click time to prevent double clicks
   const lastClickTimeRef = useRef<number>(0);
   
-  const handleStartChat = useCallback(async (mode: MessageMode) => {
-    // Check auth only when user tries to start a chat
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.info("Please sign up to start chatting!");
-      navigate("/signup");
-      return;
-    }
-
+  const handleStartChat = useCallback((mode: MessageMode) => {
     setMode(mode);
     startNewChat(false, mode);
     navigate("/chat");
   }, [setMode, startNewChat, navigate]);
   
   // Improved handler with debounce mechanism
-  const handleOpenModeSelector = useCallback(async () => {
+  const handleOpenModeSelector = useCallback(() => {
     const now = Date.now();
     const timeSinceLastClick = now - lastClickTimeRef.current;
     
     // Only open if it's not already open AND enough time has passed (300ms)
     if (!modeSelectorOpen && timeSinceLastClick > 300) {
-      // Check auth only when user tries to open mode selector
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.info("Please sign up to start chatting!");
-        navigate("/signup");
-        return;
-      }
-
       console.log('Opening mode selector');
       lastClickTimeRef.current = now;
       setModeSelectorOpen(true);
     }
-  }, [modeSelectorOpen, navigate]);
+  }, [modeSelectorOpen]);
   
-  const handleSelectMode = async (mode: MessageMode) => {
-    // Check auth only when user tries to select a mode
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.info("Please sign up to start chatting!");
-      navigate("/signup");
-      return;
-    }
-
+  const handleSelectMode = (mode: MessageMode) => {
     setMode(mode);
     setModeSelectorOpen(false);
     startNewChat(false, mode);

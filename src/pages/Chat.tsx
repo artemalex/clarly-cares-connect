@@ -1,24 +1,31 @@
+
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ChatContainer from "@/components/chat/ChatContainer";
 import ChatModeSelector from "@/components/chat/ChatModeSelector";
+import PaywallModal from "@/components/subscription/PaywallModal";
 import { useChatContext } from "@/contexts/chat";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
-import { toast } from "sonner";
 
 const Chat = () => {
-  const { startNewChat, messages, mode, setMode, conversationId, updateConversationMode } = useChatContext();
+  const { remainingMessages, startNewChat, messages, mode, setMode, conversationId, updateConversationMode } = useChatContext();
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
   const { id } = useParams<{ id?: string }>();
   const isMobile = useIsMobile();
   const [isScrolled, setIsScrolled] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
+
+  // Show paywall when messages are depleted
+  useEffect(() => {
+    if (remainingMessages <= 0) {
+      setPaywallOpen(true);
+    }
+  }, [remainingMessages]);
 
   // Handle scroll event on mobile to collapse header
   useEffect(() => {
@@ -38,33 +45,21 @@ const Chat = () => {
     };
   }, [isMobile]);
 
-  const handleNewChat = async () => {
-    // Check auth only when user tries to start a new chat
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.info("Please sign up to start chatting!");
-      navigate("/signup");
-      return;
-    }
+  const handleNewChat = () => {
     setModeSelectorOpen(true);
   };
 
-  const handleSelectMode = async (selectedMode: MessageMode) => {
-    // Check auth only when user tries to select a mode
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      toast.info("Please sign up to start chatting!");
-      navigate("/signup");
-      return;
-    }
-
+  const handleSelectMode = (selectedMode: MessageMode) => {
     console.log('Mode selected in Chat.tsx:', selectedMode);
+    // Set the mode in context state
     setMode(selectedMode);
     setModeSelectorOpen(false);
     
+    // If there's no conversation yet, start a new one with selected mode
     if (!conversationId) {
       startNewChat(false, selectedMode);
     } else {
+      // If we have an existing conversation, update its mode
       updateConversationMode(selectedMode);
     }
   };
@@ -98,7 +93,7 @@ const Chat = () => {
           100% { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-          animation: fade-in 0.3s ease-out forwards;
+          animation: fade-in 0.3s ease-out;
         }
       `}} />
       
@@ -131,11 +126,16 @@ const Chat = () => {
             <ChatContainer />
           </div>
           
+          <PaywallModal 
+            open={paywallOpen} 
+            onClose={() => setPaywallOpen(false)} 
+          />
+          
           <ChatModeSelector
             isOpen={modeSelectorOpen}
             onClose={() => setModeSelectorOpen(false)}
             onSelectMode={handleSelectMode}
-            initialMode={mode}
+            initialMode={mode} // Pass current mode as initial value
           />
         </div>
       </div>

@@ -1,44 +1,23 @@
+
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Mic, Send, LogIn } from "lucide-react";
+import { Mic, Send } from "lucide-react";
 import { useChatContext } from "@/contexts/chat";
 import VoiceRecorder from "./VoiceRecorder";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { supabase } from "@/lib/supabase";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 const ChatInput = () => {
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [micHovered, setMicHovered] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { sendMessage, isLoading } = useChatContext();
+  const { sendMessage, isLoading, remainingMessages, isSubscribed } = useChatContext();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
-
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-    };
-    
-    checkAuth();
-    
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-    
-    return () => subscription.unsubscribe();
-  }, []);
 
   // Auto focus on the textarea when component mounts
   useEffect(() => {
@@ -47,28 +26,16 @@ const ChatInput = () => {
     }
   }, []);
 
-  const handleSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!message.trim() || isLoading) return;
-
-    if (!isAuthenticated) {
-      // Store the message in localStorage
-      const pendingMessages = JSON.parse(localStorage.getItem('pending_messages') || '[]');
-      pendingMessages.push(message);
-      localStorage.setItem('pending_messages', JSON.stringify(pendingMessages));
-      
-      // Show toast and redirect to signup
-      toast.info("Please sign up to start chatting!");
-      navigate("/signup");
-      return;
-    }
-
-    // If authenticated, send the message
-    await sendMessage(message);
-    setMessage("");
-    setIsFocused(false);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
+    if (message.trim()) {
+      // Allow scrolling for this user message
+      sendMessage(message);
+      setMessage("");
+      setIsFocused(false);
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     }
   };
 
@@ -80,18 +47,6 @@ const ChatInput = () => {
   };
 
   const handleVoiceTranscript = (text: string) => {
-    if (!isAuthenticated) {
-      // Store the voice message in localStorage
-      const pendingMessages = JSON.parse(localStorage.getItem('pending_messages') || '[]');
-      pendingMessages.push(text);
-      localStorage.setItem('pending_messages', JSON.stringify(pendingMessages));
-      
-      // Show toast and redirect to signup
-      toast.info("Please sign up to start chatting!");
-      navigate("/signup");
-      return;
-    }
-
     sendMessage(text);
     setIsRecording(false);
   };
@@ -105,87 +60,109 @@ const ChatInput = () => {
   }, [message]);
 
   return (
-    <div className="p-4 border-t bg-background">
-      {!isAuthenticated && (
-        <div className="mb-4 p-4 bg-muted rounded-lg flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <LogIn className="h-5 w-5" />
-            <span>Sign up to start chatting!</span>
-          </div>
-          <Button onClick={() => navigate("/signup")} variant="default">
-            Sign Up
-          </Button>
-        </div>
+    <form 
+      onSubmit={handleSubmit} 
+      className={cn(
+        "p-2 sm:p-3 border-t bg-card sticky bottom-0 z-10",
+        "rounded-b-xl transition-all",
+        isFocused ? "pb-3" : "pb-2"
       )}
-      
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <div className="flex-1 relative">
-          <textarea
-            ref={textareaRef}
+    >
+      <div className="flex flex-col space-y-2">
+        {/* Show remaining messages indicator */}
+        <div className={cn(
+          "flex justify-between items-center transition-all overflow-hidden",
+          (isFocused && !isSubscribed && remainingMessages > 0) || remainingMessages <= 0 
+            ? "max-h-6 mb-1 opacity-100" 
+            : "max-h-0 mb-0 opacity-0"
+        )}>
+          {!isSubscribed && remainingMessages > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {remainingMessages} free messages remaining
+            </span>
+          )}
+          {remainingMessages <= 0 && (
+            <span className="text-xs text-muted-foreground">
+              You've reached your message limit
+            </span>
+          )}
+        </div>
+        
+        <div className="relative flex flex-col sm:flex-row">
+          <Textarea
+            placeholder="Type a message... (Press Enter to send)"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder={isAuthenticated ? "Type your message..." : "Sign up to start chatting..."}
+            onBlur={() => message.length === 0 && setIsFocused(false)}
             className={cn(
-              "w-full resize-none rounded-lg border bg-background px-4 py-3 pr-12",
-              "focus:outline-none focus:ring-2 focus:ring-primary",
-              "min-h-[44px] max-h-[200px]",
-              !isAuthenticated && "opacity-50 cursor-not-allowed"
+              "resize-none flex-1 pr-[90px] transition-all rounded-2xl py-2 px-3 min-h-0",
+              isFocused ? "min-h-[80px]" : "min-h-[40px]"
             )}
-            disabled={!isAuthenticated}
+            disabled={isLoading || remainingMessages <= 0}
+            ref={textareaRef}
             rows={1}
           />
-          <Button
-            type="submit"
-            size="icon"
-            className={cn(
-              "absolute right-2 bottom-2",
-              "h-8 w-8",
-              "rounded-full",
-              "bg-primary text-primary-foreground",
-              "hover:bg-primary/90",
-              "disabled:opacity-50 disabled:cursor-not-allowed"
-            )}
-            disabled={!message.trim() || isLoading || !isAuthenticated}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
-        
-        {!isMobile && (
-          <Button
-            type="button"
-            size="icon"
-            variant="outline"
-            className={cn(
-              "h-12 w-12",
-              "rounded-full",
-              "border-2",
-              isRecording && "border-primary bg-primary/10"
-            )}
-            onClick={() => setIsRecording(true)}
-            disabled={!isAuthenticated}
-          >
-            <Mic className="h-5 w-5" />
-          </Button>
-        )}
-      </form>
+          <div className="absolute right-2 bottom-2 flex flex-col gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    type="button" 
+                    variant={micHovered ? "default" : "outline"} 
+                    size="icon"
+                    onClick={() => setIsRecording(true)} // This immediately opens the dialog, which auto-starts recording
+                    onMouseEnter={() => setMicHovered(true)}
+                    onMouseLeave={() => setMicHovered(false)}
+                    disabled={isLoading || remainingMessages <= 0}
+                    className={cn(
+                      "rounded-full h-8 w-8 flex-shrink-0 transition-colors duration-300",
+                      micHovered && "bg-primary text-primary-foreground"
+                    )}
+                  >
+                    <Mic className={cn("h-4 w-4", micHovered && "animate-scale-in")} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Record voice message</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
-      <Dialog open={isRecording} onOpenChange={setIsRecording}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Voice Message</DialogTitle>
-          </DialogHeader>
-          <div className="p-4">
-            <p className="text-center text-muted-foreground">
-              Voice messages are coming soon!
-            </p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    type="submit" 
+                    disabled={!message.trim() || isLoading || remainingMessages <= 0}
+                    size="icon"
+                    className="rounded-full h-8 w-8 flex-shrink-0"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Send message (Enter)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
+        </div>
+        <div className="text-xs text-muted-foreground mt-1 ml-2 hidden sm:block">
+          <span>Press <kbd className="px-1 py-0.5 bg-muted text-muted-foreground rounded border">Enter</kbd> to send, <kbd className="px-1 py-0.5 bg-muted text-muted-foreground rounded border">Shift+Enter</kbd> for new line</span>
+        </div>
+      </div>
+      
+      <Dialog open={isRecording} onOpenChange={setIsRecording}>
+        <DialogContent className="sm:max-w-md">
+          <VoiceRecorder 
+            onTranscriptSend={handleVoiceTranscript} 
+            disabled={isLoading || remainingMessages <= 0}
+          />
         </DialogContent>
       </Dialog>
-    </div>
+    </form>
   );
 };
 
