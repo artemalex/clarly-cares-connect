@@ -1,10 +1,9 @@
-
 import { createContext, useContext, ReactNode } from "react";
 import { ChatContextType } from "./types";
 import { useChatOperations } from "./useChatOperations";
 
 // Create the context
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
+export const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 // Hook to use the chat context
 export const useChatContext = () => {

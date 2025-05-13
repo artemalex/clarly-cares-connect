@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -79,7 +78,7 @@ export function useConversationManagement() {
       const result = await loadConversation(id);
       
       if (!result.success) {
-        navigate("/chat");
+        console.log("Failed to load conversation:", id);
         return;
       }
       

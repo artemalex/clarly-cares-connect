@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
@@ -6,31 +5,25 @@ import { supabase } from "@/lib/supabase";
 import { Message, MessageMode } from "../types";
 import { sendMessageToAPI } from "../utils/messageUtils";
 import { getGuestId } from "@/utils/guestUtils";
-import { MAX_FREE_MESSAGES } from "../constants";
 
 export function useMessageHandling(
   messages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-  messagesUsed: number,
-  messagesLimit: number,
   isLoading: boolean,
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  isSubscribed: boolean,
   mode: MessageMode,
   conversationId: string | null,
-  setMessagesUsed: React.Dispatch<React.SetStateAction<number>>,
-  checkSubscriptionStatus: () => Promise<void>,
   startNewChat: () => Promise<void>,
   setConversationId: React.Dispatch<React.SetStateAction<string | null>>
 ) {
   // Send a message and get a response
   const sendMessage = async (content: string) => {
     if (content.trim() === "") return;
-    
-    if (messagesUsed >= messagesLimit) {
-      toast.error(isSubscribed 
-        ? "You've reached your monthly message limit." 
-        : "You've reached your free message limit. Please subscribe to continue.");
+
+    // Check if user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error("Please sign up to start chatting!");
       return;
     }
 
@@ -85,13 +78,6 @@ export function useMessageHandling(
       
       // Update local state with just the assistant response (user message already added)
       setMessages(prevMessages => [...prevMessages, result.assistantMessage]);
-      
-      // For all users (both logged in and guest), increment the local message count
-      // The backend will handle the actual database update
-      setMessagesUsed(prev => prev + 1);
-      
-      // Reload message usage count to make sure it's in sync with the backend
-      await checkSubscriptionStatus();
       
     } catch (error) {
       toast.error("Failed to get a response. Please try again.");
