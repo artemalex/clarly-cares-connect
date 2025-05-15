@@ -1,14 +1,5 @@
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { 
-  Hourglass,
-  Heart,
-  GitBranch,
-  CloudCog,
-  Sprout,
-  LifeBuoy
-} from "lucide-react";
-
+import { Hourglass, Heart, GitBranch, CloudCog, Sprout, LifeBuoy } from "lucide-react";
 const features = [{
   icon: <Hourglass className="h-8 w-8 text-empath-500" />,
   title: "Instant Space to Breathe",
@@ -34,12 +25,11 @@ const features = [{
   title: "Support That's Always There",
   description: "Whether it's a rough morning or a midnight spiral, HelloClari is on — as often as you need — for the cost of a single lunch."
 }];
-
 const FeaturesSection = () => {
   return <section className="py-16 bg-gradient-to-b from-white to-muted/30 rounded-xl">
       <div className="container">
         <h2 className="text-3xl font-bold text-center mb-4">Turn Daily Stress into Clarity, Calm, and Control</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">Six ways HelloClari helps you feel lighter, clearer, and more grounded</p>
+        <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">Six ways Clari helps you feel lighter, clearer, and more grounded</p>
         
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
           {features.map((feature, i) => <Card key={i} className="bg-background border-none shadow-sm hover:shadow-md transition-all">
@@ -55,5 +45,4 @@ const FeaturesSection = () => {
       </div>
     </section>;
 };
-
 export default FeaturesSection;
