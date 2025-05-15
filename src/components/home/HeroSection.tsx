@@ -17,7 +17,7 @@ const HeroSection = ({
         <div className="max-w-4xl mx-auto text-center">
           <div className="animate-fade-up">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-clarly-600 to-support-600 bg-clip-text text-empath-950">When work drains you emotionally, talk to Clari</h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">Your 24/7 ally for work stress that gets too heavy to carry alone</p>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">Your always-on, AI-powered ally who listens, guides, and never judges</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="px-8 py-6 text-lg" onClick={handleOpenModeSelector}>
                 Start Chatting <ArrowRight className="ml-2" />
