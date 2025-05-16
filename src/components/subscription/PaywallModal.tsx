@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
@@ -112,7 +111,7 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
             
             <ul className="space-y-2">
               {[
-                "3,000 messages per month",
+                "Unlimited messages",
                 "Priority support",
                 "Save conversation history",
                 "Access to all conversation modes"

@@ -10,7 +10,7 @@ export function useSubscriptionStatus() {
   const [isInTrial, setIsInTrial] = useState<boolean>(false);
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   
-  const remainingMessages = messagesLimit - messagesUsed;
+  const remainingMessages = isSubscribed ? Infinity : messagesLimit - messagesUsed;
 
   const checkSubscriptionStatus = async () => {
     try {

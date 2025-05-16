@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -72,7 +71,7 @@ const ChatInput = () => {
         {/* Show remaining messages indicator */}
         <div className={cn(
           "flex justify-between items-center transition-all overflow-hidden",
-          (isFocused && !isSubscribed && remainingMessages > 0) || remainingMessages <= 0 
+          (isFocused && !isSubscribed && remainingMessages > 0) || (!isSubscribed && remainingMessages <= 0) 
             ? "max-h-6 mb-1 opacity-100" 
             : "max-h-0 mb-0 opacity-0"
         )}>
@@ -81,7 +80,7 @@ const ChatInput = () => {
               {remainingMessages} free messages remaining
             </span>
           )}
-          {remainingMessages <= 0 && (
+          {!isSubscribed && remainingMessages <= 0 && (
             <span className="text-xs text-muted-foreground">
               You've reached your message limit
             </span>
