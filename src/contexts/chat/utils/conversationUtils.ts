@@ -47,6 +47,7 @@ export async function loadConversation(id: string) {
       id: msg.id,
       role: msg.role as "user" | "assistant" | "system",
       content: msg.content,
+      created_at: msg.created_at,
       timestamp: new Date(msg.created_at)
     }));
     

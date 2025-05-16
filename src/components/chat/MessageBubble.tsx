@@ -9,11 +9,16 @@ interface MessageBubbleProps {
 
 const MessageBubble = ({ message }: MessageBubbleProps) => {
   const isUser = message.role === "user";
+  // Use created_at if available, otherwise use timestamp, or fallback to current time
+  const messageTime = message.created_at 
+    ? new Date(message.created_at) 
+    : (message.timestamp || new Date());
+  
   const formattedTime = new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "numeric",
     hour12: true,
-  }).format(message.timestamp);
+  }).format(messageTime);
 
   return (
     <motion.div 

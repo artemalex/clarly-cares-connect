@@ -8,6 +8,7 @@ export type Message = {
   role: MessageRole;
   content: string;
   created_at?: string;
+  timestamp?: Date; // Add timestamp property
 };
 
 export type MessageMode = "vent" | "slow";

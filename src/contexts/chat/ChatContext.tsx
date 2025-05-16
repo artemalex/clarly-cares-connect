@@ -23,9 +23,28 @@ interface ChatProviderProps {
 // Chat provider component
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const chatOperations = useChatOperations();
+  
+  const contextValue: ChatContextType = {
+    messages: chatOperations.messages,
+    mode: chatOperations.mode,
+    messagesUsed: chatOperations.messagesUsed,
+    remainingMessages: chatOperations.remainingMessages,
+    isLoading: chatOperations.isLoading,
+    isSubscribed: chatOperations.isSubscribed,
+    freeTrialActive: chatOperations.freeTrialActive,
+    freeTrialEndDate: chatOperations.freeTrialEndDate,
+    conversationId: chatOperations.conversationId,
+    setMode: chatOperations.setMode,
+    sendMessage: chatOperations.sendMessage,
+    startNewChat: chatOperations.startNewChat,
+    checkSubscriptionStatus: chatOperations.checkSubscriptionStatus,
+    loadConversation: chatOperations.loadConversation,
+    generateInitialMessage: chatOperations.generateInitialMessage,
+    updateConversationMode: chatOperations.updateConversationMode
+  };
 
   return (
-    <ChatContext.Provider value={chatOperations}>
+    <ChatContext.Provider value={contextValue}>
       {children}
     </ChatContext.Provider>
   );

@@ -8,7 +8,7 @@ import { useChatContext } from "@/contexts/chat";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MessageMode } from "@/contexts/chat/constants";
+import { MessageMode } from "@/contexts/chat/types";
 import { cn } from "@/lib/utils";
 
 const Chat = () => {
@@ -57,7 +57,7 @@ const Chat = () => {
     
     // If there's no conversation yet, start a new one with selected mode
     if (!conversationId) {
-      startNewChat(false, selectedMode);
+      startNewChat(selectedMode);
     } else {
       // If we have an existing conversation, update its mode
       updateConversationMode(selectedMode);

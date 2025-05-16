@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useSubscriptionStatus } from "./hooks/useSubscriptionStatus";
 import { useConversationManagement } from "./hooks/useConversationManagement";
 import { useMessageHandling } from "./hooks/useMessageHandling";
+import { MessageMode } from "./types";
 
 export function useChatOperations() {
   const {
