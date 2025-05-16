@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { MAX_FREE_MESSAGES } from "../constants";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function useSubscriptionStatus() {
   const [messagesUsed, setMessagesUsed] = useState<number>(0);
@@ -10,18 +10,27 @@ export function useSubscriptionStatus() {
   const [isInTrial, setIsInTrial] = useState<boolean>(false);
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const remainingMessages = isSubscribed ? Infinity : messagesLimit - messagesUsed;
 
   const checkSubscriptionStatus = async () => {
     try {
       const session = await supabase.auth.getSession();
       
-      if (!session.data.session) {
+      // Only redirect to signup if we're on a protected route
+      if (!session.data.session && isProtectedRoute(location.pathname)) {
         navigate("/signup", { 
           state: { 
             message: "Please sign up to start chatting. You'll get 7 days of free access!" 
           }
         });
+        return;
+      }
+      
+      // If no session and not on a protected route, just return
+      if (!session.data.session) {
         return;
       }
       
@@ -56,6 +65,12 @@ export function useSubscriptionStatus() {
     } catch (error) {
       console.error("Failed to check subscription status:", error);
     }
+  };
+
+  // Helper function to determine if a route requires authentication
+  const isProtectedRoute = (pathname: string) => {
+    const protectedRoutes = ['/chat', '/history', '/profile'];
+    return protectedRoutes.some(route => pathname.startsWith(route));
   };
 
   return {
