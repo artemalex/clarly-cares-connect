@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Heart } from "lucide-react";
+import { Heart, Gift } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -42,6 +43,9 @@ const Signup = () => {
     setIsLoading(true);
     
     try {
+      // Store the guest ID before signing up
+      const guestId = getGuestId();
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -50,21 +54,24 @@ const Signup = () => {
       if (error) throw error;
       
       if (data.user) {
-        // Set up trial period
-        const trialEndsAt = new Date();
-        trialEndsAt.setDate(trialEndsAt.getDate() + 7);
-
-        await supabase
-          .from('subscriptions')
-          .insert({
-            user_id: data.user.id,
-            is_active: false,
-            trial_ends_at: trialEndsAt.toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-
-        toast.success("Account created successfully! You have 7 days of free access.");
+        // If there was a guest ID, migrate the data
+        if (guestId) {
+          try {
+            await supabase.functions.invoke('migrate-guest-data', {
+              body: { guest_id: guestId }
+            });
+            
+            // Clear the guest ID after successful migration
+            clearGuestId();
+            
+            toast.success("Your previous chat history has been saved to your account!");
+          } catch (migrationError) {
+            console.error("Failed to migrate guest data:", migrationError);
+            // Don't throw here, we still want to complete signup
+          }
+        }
+        
+        toast.success("Account created successfully!");
         navigate("/chat");
       }
     } catch (err: any) {
@@ -78,6 +85,14 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     setIsLoading(true);
     try {
+      // Store the guest ID before signing up
+      const guestId = getGuestId();
+      
+      // If there was a guest ID, store it in localStorage to be used after OAuth redirect
+      if (guestId) {
+        localStorage.setItem('pending_guest_migration', guestId);
+      }
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -101,9 +116,16 @@ const Signup = () => {
             <Heart className="h-8 w-8 text-clarly-500" />
           </div>
           <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>
+          <CardDescription className="pb-2">
             Enter your email below to create your account
           </CardDescription>
+          
+          <div className="bg-green-50 border border-green-100 rounded-md p-3 flex items-center text-left">
+            <Gift className="h-5 w-5 text-green-600 mr-2 shrink-0" />
+            <p className="text-sm text-green-800">
+              Get 7 days of premium features for free when you sign up!
+            </p>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
