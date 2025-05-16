@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.0";
 import { corsHeaders } from "../_shared/cors.ts";
@@ -168,26 +167,32 @@ serve(async (req) => {
       content: msg.content
     }));
 
-    // If it's an initial message, add a system prompt based on the mode
-    if (isInitial || messages.length === 0) {
-      // Default to conversationData.mode, but use the parameter mode if provided
-      // This ensures the correct prompt is used regardless of how the function is called
-      const currentMode = mode || conversationData.mode;
-      
-      console.log(`Using mode for system prompt: ${currentMode}`);
-      
-      if (!currentMode || (currentMode !== 'vent' && currentMode !== 'slow')) {
-        console.error(`Invalid mode: ${currentMode}, defaulting to 'slow'`);
-      }
-      
-      const systemPrompt = currentMode === 'vent' 
-        ? SYSTEM_PROMPTS.vent
-        : SYSTEM_PROMPTS.slow;
-      
+    // Always determine the current mode
+    const currentMode = mode || conversationData.mode;
+    
+    console.log(`Using mode for system prompt: ${currentMode}`);
+    
+    if (!currentMode || (currentMode !== 'vent' && currentMode !== 'slow')) {
+      console.error(`Invalid mode: ${currentMode}, defaulting to 'slow'`);
+    }
+    
+    // Get the appropriate system prompt
+    const systemPrompt = currentMode === 'vent' 
+      ? SYSTEM_PROMPTS.vent
+      : SYSTEM_PROMPTS.slow;
+
+    // Check if the first message is already a system prompt
+    const hasSystemPrompt = openaiMessages.length > 0 && openaiMessages[0].role === 'system';
+
+    // If there's no system prompt, add it
+    if (!hasSystemPrompt) {
       openaiMessages.unshift({
         role: "system",
         content: systemPrompt
       });
+    } else {
+      // If there is a system prompt, update it to ensure it matches the current mode
+      openaiMessages[0].content = systemPrompt;
     }
 
     // Call OpenAI API
