@@ -443,7 +443,7 @@ const Profile = () => {
                         )}
                         <div className="flex items-center justify-between p-4 border border-clarly-200 bg-clarly-50 rounded-md">
                           <div className="font-medium">Premium</div>
-                          <div>Unlimited messages</div>
+                          <div>3,000 messages / month</div>
                         </div>
                       </div>
                       {!freeTrialActive && (
