@@ -26,7 +26,7 @@ const Home = () => {
   
   const handleStartChat = useCallback((mode: MessageMode) => {
     setMode(mode);
-    startNewChat(mode);
+    startNewChat(false, mode);
     navigate("/chat");
   }, [setMode, startNewChat, navigate]);
   
@@ -46,7 +46,7 @@ const Home = () => {
   const handleSelectMode = (mode: MessageMode) => {
     setMode(mode);
     setModeSelectorOpen(false);
-    startNewChat(mode);
+    startNewChat(false, mode);
     navigate("/chat");
   };
   

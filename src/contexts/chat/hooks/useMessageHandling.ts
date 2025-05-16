@@ -20,7 +20,7 @@ export function useMessageHandling(
   conversationId: string | null,
   setMessagesUsed: React.Dispatch<React.SetStateAction<number>>,
   checkSubscriptionStatus: () => Promise<void>,
-  startNewChat: (mode: MessageMode | null) => Promise<string | null>,
+  startNewChat: () => Promise<void>,
   setConversationId: React.Dispatch<React.SetStateAction<string | null>>
 ) {
   // Send a message and get a response
@@ -42,8 +42,9 @@ export function useMessageHandling(
         activeConversationId = savedId;
         setConversationId(savedId);
       } else {
-        // Start a new conversation with the current mode
-        activeConversationId = await startNewChat(mode);
+        // Start a new conversation
+        await startNewChat();
+        activeConversationId = conversationId;
       }
       
       // If still no conversation ID, something went wrong

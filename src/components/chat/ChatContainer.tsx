@@ -6,7 +6,7 @@ import ChatInput from "./ChatInput";
 import ChatModeSelector from "./ChatModeSelector";
 import { useChatContext } from "@/contexts/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MessageMode } from "@/contexts/chat/types";
+import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
 
 const ChatContainer = () => {
@@ -23,7 +23,7 @@ const ChatContainer = () => {
     
     // Only start a new chat if we don't have an existing conversation
     if (!conversationId) {
-      startNewChat(selectedMode);
+      startNewChat(false, selectedMode);
     } else {
       // If we have an existing conversation, update its mode
       updateConversationMode(selectedMode);

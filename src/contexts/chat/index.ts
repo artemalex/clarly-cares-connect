@@ -1,7 +1,7 @@
 
 // Export all components from their respective files
 export * from './types';
-export * from './constants'; // MessageMode is also exported here, which causes the conflict
+export * from './constants';
 export * from './ChatContext';
 export * from './useChatOperations';
 export * from './hooks/useSubscriptionStatus';
