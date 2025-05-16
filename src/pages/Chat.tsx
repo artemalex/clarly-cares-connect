@@ -1,6 +1,6 @@
-
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 import ChatContainer from "@/components/chat/ChatContainer";
 import ChatModeSelector from "@/components/chat/ChatModeSelector";
 import PaywallModal from "@/components/subscription/PaywallModal";
@@ -8,10 +8,11 @@ import { useChatContext } from "@/contexts/chat";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MessageMode } from "@/contexts/chat/types";
+import { MessageMode } from "@/contexts/chat/constants";
 import { cn } from "@/lib/utils";
 
 const Chat = () => {
+  const navigate = useNavigate();
   const { remainingMessages, startNewChat, messages, mode, setMode, conversationId, updateConversationMode } = useChatContext();
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [modeSelectorOpen, setModeSelectorOpen] = useState(false);
@@ -19,6 +20,22 @@ const Chat = () => {
   const isMobile = useIsMobile();
   const [isScrolled, setIsScrolled] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/signup", { 
+          state: { 
+            message: "Please sign up to start chatting. You'll get 7 days of free access!" 
+          }
+        });
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   // Show paywall when messages are depleted
   useEffect(() => {
@@ -57,8 +74,7 @@ const Chat = () => {
     
     // If there's no conversation yet, start a new one with selected mode
     if (!conversationId) {
-      // Updated to use the correct function signature
-      startNewChat(selectedMode);
+      startNewChat(false, selectedMode);
     } else {
       // If we have an existing conversation, update its mode
       updateConversationMode(selectedMode);
