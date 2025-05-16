@@ -24,6 +24,7 @@ interface ChatProviderProps {
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const chatOperations = useChatOperations();
   
+  // Create a context value that strictly matches the ChatContextType
   const contextValue: ChatContextType = {
     messages: chatOperations.messages,
     mode: chatOperations.mode,

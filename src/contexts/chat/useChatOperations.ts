@@ -84,7 +84,8 @@ export function useChatOperations() {
     conversationId,
     setMode,
     sendMessage,
-    startNewChat,
+    // Ensure startNewChat function has the same signature as in the types
+    startNewChat: (selectedMode?: MessageMode | null) => startNewChat(false, selectedMode),
     checkSubscriptionStatus,
     loadConversation: loadConversationData,
     generateInitialMessage: (conversationId: string) => generateFirstMessage(conversationId, mode),

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -97,13 +96,13 @@ export function useConversationManagement() {
     }
   };
 
-  // Start a new chat conversation - don't automatically select a mode
-  const startNewChat = async (isInitial = false, selectedMode?: MessageMode) => {
+  // Start a new chat conversation - ensure it returns string | null
+  const startNewChat = async (isInitial = false, selectedMode?: MessageMode | null): Promise<string | null> => {
     try {
       // Don't proceed if no mode is selected and one wasn't passed
       if (!selectedMode && !mode) {
         console.log("No mode selected yet, not starting chat");
-        return;
+        return null;
       }
       
       const session = await supabase.auth.getSession();
@@ -132,7 +131,7 @@ export function useConversationManagement() {
         if (response.error) {
           console.error("Conversation creation failed", response.error);
           toast.error("Failed to start new chat");
-          return;
+          return null;
         }
         
         if (response.data && response.data.conversationId) {
@@ -142,12 +141,12 @@ export function useConversationManagement() {
           if (!isInitial) {
             await generateFirstMessage(response.data.conversationId, modeToUse);
           }
-          return;
+          return response.data.conversationId;
         }
       } else if (modeToUse) {
         // Create a new conversation for logged in users (using existing method)
         const result = await createConversation(modeToUse, userId, guestId);
-        if (!result.success) return;
+        if (!result.success) return null;
         
         // Update state with the new conversation ID
         setConversationId(result.conversationId);
@@ -162,10 +161,15 @@ export function useConversationManagement() {
         if (!isInitial) {
           await generateFirstMessage(result.conversationId, modeToUse);
         }
+        
+        return result.conversationId;
       }
+      
+      return null;
     } catch (error) {
       console.error("Error starting new chat:", error);
       toast.error("Failed to start new chat");
+      return null;
     }
   };
   
