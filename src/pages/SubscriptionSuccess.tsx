@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ const SubscriptionSuccess = () => {
             </div>
             <h1 className="text-3xl font-bold">Welcome to Premium!</h1>
             <p className="text-lg text-muted-foreground max-w-md">
-              Your subscription was successful. You now have access to all premium features and unlimited messages.
+              Your subscription was successful. You now have access to all premium features and 3,000 messages per month.
             </p>
             <div className="flex space-x-4 mt-6">
               <Button asChild size="lg">

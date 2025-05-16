@@ -272,9 +272,7 @@ const Profile = () => {
                       <CardTitle className="text-lg">Messages Remaining</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-4xl font-bold">
-                        {isSubscribed ? "Unlimited" : remainingMessages}
-                      </p>
+                      <p className="text-4xl font-bold">{remainingMessages}</p>
                       {!isSubscribed && !freeTrialActive && remainingMessages <= 3 && (
                         <p className="text-sm text-amber-500 mt-2">
                           You're running low on messages! Consider upgrading.
