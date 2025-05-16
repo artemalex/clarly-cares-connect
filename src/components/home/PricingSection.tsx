@@ -1,7 +1,8 @@
+
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Gift } from "lucide-react";
 const PricingSection = () => {
   return <section className="py-16 bg-gradient-to-b from-white to-muted/30">
       <div className="container">
@@ -44,6 +45,14 @@ const PricingSection = () => {
               <div className="mb-6">
                 <p className="text-4xl font-bold">€10<span className="text-lg text-muted-foreground font-normal">/month</span></p>
               </div>
+              
+              <div className="bg-green-50 border border-green-100 rounded-md p-3 mb-4 flex items-center">
+                <Gift className="h-5 w-5 text-green-600 mr-2 shrink-0" />
+                <p className="text-sm text-green-800">
+                  Try premium free for 7 days when you sign up!
+                </p>
+              </div>
+              
               <ul className="space-y-3">
                 {["Unlimited emotional support", "Deep personalization", "Advanced emotional pattern recognition", "Priority response times", "Safe, private, and judgment-free space"].map((feature, i) => <li key={i} className="flex items-start">
                     <Check className="h-5 w-5 text-clarly-500 mr-2 shrink-0 mt-0.5" />

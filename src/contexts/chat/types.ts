@@ -1,28 +1,32 @@
 
-import { MessageMode } from "./constants";
+import { User } from "@supabase/supabase-js";
 
-export type { MessageMode };
+export type MessageRole = "system" | "user" | "assistant" | "function";
 
-export interface Message {
-  id: string;
-  role: "user" | "assistant" | "system";
+export type Message = {
+  id?: string;
+  role: MessageRole;
   content: string;
-  timestamp: Date;
-}
+  created_at?: string;
+};
 
-export interface ChatContextType {
+export type MessageMode = "vent" | "slow";
+
+export type ChatContextType = {
   messages: Message[];
   mode: MessageMode | null;
   messagesUsed: number;
   remainingMessages: number;
   isLoading: boolean;
   isSubscribed: boolean;
+  freeTrialActive: boolean;
+  freeTrialEndDate: Date | null;
   conversationId: string | null;
   setMode: (mode: MessageMode) => void;
-  sendMessage: (content: string) => void;
-  startNewChat: (isInitial?: boolean, selectedMode?: MessageMode) => Promise<void>;
+  sendMessage: (message: string) => Promise<void>;
+  startNewChat: (mode?: MessageMode | null) => Promise<string | null>;
   checkSubscriptionStatus: () => Promise<void>;
   loadConversation: (id: string) => Promise<void>;
   generateInitialMessage: (conversationId: string) => Promise<void>;
-  updateConversationMode: (selectedMode: MessageMode) => Promise<void>;
-}
+  updateConversationMode: (mode: MessageMode) => Promise<void>;
+};

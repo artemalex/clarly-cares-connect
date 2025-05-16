@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Heart } from "lucide-react";
+import { Heart, Gift } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -116,9 +116,16 @@ const Signup = () => {
             <Heart className="h-8 w-8 text-clarly-500" />
           </div>
           <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>
+          <CardDescription className="pb-2">
             Enter your email below to create your account
           </CardDescription>
+          
+          <div className="bg-green-50 border border-green-100 rounded-md p-3 flex items-center text-left">
+            <Gift className="h-5 w-5 text-green-600 mr-2 shrink-0" />
+            <p className="text-sm text-green-800">
+              Get 7 days of premium features for free when you sign up!
+            </p>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (

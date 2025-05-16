@@ -14,9 +14,18 @@ interface PaywallModalProps {
 }
 
 const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
-  const { remainingMessages, isSubscribed } = useChatContext();
+  const { remainingMessages, isSubscribed, freeTrialActive, freeTrialEndDate } = useChatContext();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const formatDate = (date: Date | null) => {
+    if (!date) return "";
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
 
   const handleSubscribe = async () => {
     setIsLoading(true);
@@ -88,6 +97,15 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
+          {freeTrialActive && freeTrialEndDate && (
+            <div className="rounded-lg border border-green-100 bg-green-50 p-4 text-center">
+              <h3 className="font-medium text-green-800">Your Free Trial is Active!</h3>
+              <p className="text-green-700 text-sm mt-1">
+                You have premium access until {formatDate(freeTrialEndDate)}
+              </p>
+            </div>
+          )}
+        
           <div className="rounded-lg border p-4 bg-muted/30">
             <h3 className="font-medium text-lg mb-2">Premium Plan</h3>
             <p className="text-2xl font-bold mb-4">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
@@ -108,11 +126,13 @@ const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
           </div>
           
           <div className="flex flex-col space-y-2">
-            <Button onClick={handleSubscribe} disabled={isLoading} className="w-full">
-              {isLoading ? "Processing..." : "Subscribe Now"}
-            </Button>
+            {!freeTrialActive && (
+              <Button onClick={handleSubscribe} disabled={isLoading} className="w-full">
+                {isLoading ? "Processing..." : "Subscribe Now"}
+              </Button>
+            )}
             <Button variant="outline" onClick={onClose} className="w-full">
-              Maybe Later
+              {freeTrialActive ? "Continue Using Free Trial" : "Maybe Later"}
             </Button>
           </div>
         </div>

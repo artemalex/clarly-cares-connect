@@ -52,6 +52,20 @@ serve(async (req) => {
     // Check if user has a Stripe customer record
     let isSubscribed = false;
     let messagesLimit = 6; // Default free tier limit
+    let freeTrialActive = false;
+    let freeTrialEndDate = null;
+    
+    // Check if user is in free trial period (7 days from sign up)
+    const userCreatedAt = new Date(user.created_at);
+    const now = new Date();
+    const trialEndDate = new Date(userCreatedAt);
+    trialEndDate.setDate(trialEndDate.getDate() + 7); // 7-day trial
+
+    if (now < trialEndDate) {
+      freeTrialActive = true;
+      freeTrialEndDate = trialEndDate.toISOString();
+      messagesLimit = 3000; // Premium tier limit during trial
+    }
     
     if (user.email) {
       const customers = await stripe.customers.list({ email: user.email, limit: 1 });
@@ -85,7 +99,9 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         isSubscribed, 
-        messagesLimit
+        messagesLimit,
+        freeTrialActive,
+        freeTrialEndDate
       }),
       {
         headers: {
