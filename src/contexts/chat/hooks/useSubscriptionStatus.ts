@@ -8,8 +8,6 @@ export function useSubscriptionStatus() {
   const [messagesUsed, setMessagesUsed] = useState<number>(0);
   const [messagesLimit, setMessagesLimit] = useState<number>(MAX_FREE_MESSAGES);
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
-  const [freeTrialActive, setFreeTrialActive] = useState<boolean>(false);
-  const [freeTrialEndDate, setFreeTrialEndDate] = useState<Date | null>(null);
   
   // Calculate remaining messages
   const remainingMessages = messagesLimit - messagesUsed;
@@ -23,8 +21,6 @@ export function useSubscriptionStatus() {
         console.log("No active session, using free tier limits");
         setMessagesLimit(MAX_FREE_MESSAGES);
         setIsSubscribed(false);
-        setFreeTrialActive(false);
-        setFreeTrialEndDate(null);
         
         // Get guest ID, ensure one exists
         const guestId = ensureGuestId();
@@ -60,17 +56,8 @@ export function useSubscriptionStatus() {
       }
       
       console.log("Subscription status:", data);
-      
-      // Check if user is in free trial period
-      const isInFreeTrial = data.freeTrialActive;
-      const freeTrialEnd = data.freeTrialEndDate ? new Date(data.freeTrialEndDate) : null;
-      
-      setIsSubscribed(data.isSubscribed || isInFreeTrial);
-      setFreeTrialActive(isInFreeTrial);
-      setFreeTrialEndDate(freeTrialEnd);
-      
-      // If in free trial or subscribed, set premium message limit
-      setMessagesLimit(data.isSubscribed || isInFreeTrial ? data.messagesLimit : MAX_FREE_MESSAGES);
+      setIsSubscribed(data.isSubscribed);
+      setMessagesLimit(data.messagesLimit);
       
       // Load user message count
       const { data: userData, error: userError } = await supabase
@@ -98,8 +85,6 @@ export function useSubscriptionStatus() {
     messagesLimit,
     remainingMessages,
     isSubscribed,
-    freeTrialActive,
-    freeTrialEndDate,
     setMessagesUsed,
     checkSubscriptionStatus
   };

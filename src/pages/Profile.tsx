@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageSquare, Clock, CreditCard, Gift } from "lucide-react";
+import { MessageSquare, Clock, CreditCard } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useChatContext } from "@/contexts/chat";
 
@@ -30,7 +30,7 @@ const Profile = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
-  const { messagesUsed, remainingMessages, isSubscribed, freeTrialActive, freeTrialEndDate, checkSubscriptionStatus } = useChatContext();
+  const { messagesUsed, remainingMessages, isSubscribed, checkSubscriptionStatus } = useChatContext();
   
   const navigate = useNavigate();
   
@@ -142,8 +142,7 @@ const Profile = () => {
     return email.substring(0, 2).toUpperCase();
   };
   
-  const formatDate = (dateString: string | Date | null) => {
-    if (!dateString) return "";
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -247,16 +246,6 @@ const Profile = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {freeTrialActive && freeTrialEndDate && (
-                  <div className="bg-green-50 border border-green-100 p-4 rounded-lg text-center mb-4">
-                    <Gift className="h-5 w-5 text-green-600 mx-auto mb-2" />
-                    <h3 className="text-lg font-medium text-green-800">Free Trial Active</h3>
-                    <p className="text-sm text-green-700">
-                      You have premium access until {formatDate(freeTrialEndDate)}
-                    </p>
-                  </div>
-                )}
-              
                 <div className="grid gap-4 md:grid-cols-2">
                   <Card>
                     <CardHeader>
@@ -273,7 +262,7 @@ const Profile = () => {
                     </CardHeader>
                     <CardContent>
                       <p className="text-4xl font-bold">{remainingMessages}</p>
-                      {!isSubscribed && !freeTrialActive && remainingMessages <= 3 && (
+                      {!isSubscribed && remainingMessages <= 3 && (
                         <p className="text-sm text-amber-500 mt-2">
                           You're running low on messages! Consider upgrading.
                         </p>
@@ -282,7 +271,7 @@ const Profile = () => {
                   </Card>
                 </div>
                 
-                {!isSubscribed && !freeTrialActive && (
+                {!isSubscribed && (
                   <div className="bg-slate-50 p-4 rounded-lg">
                     <p className="text-sm text-muted-foreground">
                       Need more messages? Consider upgrading your subscription for unlimited access.
@@ -403,18 +392,16 @@ const Profile = () => {
                       <CreditCard className="h-8 w-8 text-clarly-500" />
                     </span>
                     <h3 className="text-xl font-bold mb-2">
-                      {isSubscribed ? (freeTrialActive ? "Free Trial" : "HelloClari Premium") : "Free Plan"}
+                      {isSubscribed ? "HelloClari Premium" : "Free Plan"}
                     </h3>
                     <p className="text-muted-foreground">
                       {isSubscribed 
-                        ? (freeTrialActive 
-                          ? `You have premium access until ${formatDate(freeTrialEndDate)}` 
-                          : "You have access to all premium features")
+                        ? "You have access to all premium features" 
                         : "Upgrade to get unlimited messages and premium features"}
                     </p>
                   </div>
                   
-                  {isSubscribed && !freeTrialActive ? (
+                  {isSubscribed ? (
                     <div className="space-y-4">
                       <div className="px-4 py-3 bg-green-50 text-green-700 rounded-md text-sm">
                         Your subscription is active
@@ -433,26 +420,18 @@ const Profile = () => {
                           <div className="font-medium">Free Plan</div>
                           <div>6 messages / month</div>
                         </div>
-                        {freeTrialActive && (
-                          <div className="flex items-center justify-between p-4 border-2 border-green-200 bg-green-50 rounded-md">
-                            <div className="font-medium">Free Trial</div>
-                            <div>3,000 messages</div>
-                          </div>
-                        )}
                         <div className="flex items-center justify-between p-4 border border-clarly-200 bg-clarly-50 rounded-md">
                           <div className="font-medium">Premium</div>
                           <div>3,000 messages / month</div>
                         </div>
                       </div>
-                      {!freeTrialActive && (
-                        <Button 
-                          onClick={handleManageSubscription} 
-                          disabled={isCreatingCheckout}
-                          className="w-full"
-                        >
-                          {isCreatingCheckout ? "Processing..." : "Upgrade to Premium - $9.99/month"}
-                        </Button>
-                      )}
+                      <Button 
+                        onClick={handleManageSubscription} 
+                        disabled={isCreatingCheckout}
+                        className="w-full"
+                      >
+                        {isCreatingCheckout ? "Processing..." : "Upgrade to Premium - $9.99/month"}
+                      </Button>
                     </div>
                   )}
                 </div>

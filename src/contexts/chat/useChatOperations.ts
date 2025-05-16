@@ -10,8 +10,6 @@ export function useChatOperations() {
     remainingMessages,
     messagesLimit,
     isSubscribed,
-    freeTrialActive,
-    freeTrialEndDate,
     setMessagesUsed,
     checkSubscriptionStatus
   } = useSubscriptionStatus();
@@ -78,8 +76,6 @@ export function useChatOperations() {
     remainingMessages,
     isLoading,
     isSubscribed,
-    freeTrialActive,
-    freeTrialEndDate,
     conversationId,
     setMode,
     sendMessage,
