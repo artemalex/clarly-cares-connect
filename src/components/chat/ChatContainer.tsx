@@ -23,7 +23,7 @@ const ChatContainer = () => {
     
     // Only start a new chat if we don't have an existing conversation
     if (!conversationId) {
-      // Updated to use the correct function signature
+      // Updated to match the new function signature
       startNewChat(selectedMode);
     } else {
       // If we have an existing conversation, update its mode

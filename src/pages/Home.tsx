@@ -26,7 +26,7 @@ const Home = () => {
   
   const handleStartChat = useCallback((mode: MessageMode) => {
     setMode(mode);
-    // Updated to use the correct function signature
+    // Updated to match the new function signature
     startNewChat(mode);
     navigate("/chat");
   }, [setMode, startNewChat, navigate]);
@@ -47,7 +47,7 @@ const Home = () => {
   const handleSelectMode = (mode: MessageMode) => {
     setMode(mode);
     setModeSelectorOpen(false);
-    // Updated to use the correct function signature
+    // Updated to match the new function signature
     startNewChat(mode);
     navigate("/chat");
   };

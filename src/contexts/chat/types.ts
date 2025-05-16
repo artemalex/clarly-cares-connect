@@ -8,7 +8,7 @@ export type Message = {
   role: MessageRole;
   content: string;
   created_at?: string;
-  timestamp?: Date; // Timestamp property is defined
+  timestamp?: Date; // Ensure timestamp property is defined
 };
 
 export type MessageMode = "vent" | "slow";
@@ -25,8 +25,8 @@ export type ChatContextType = {
   conversationId: string | null;
   setMode: (mode: MessageMode) => void;
   sendMessage: (message: string) => Promise<void>;
-  // Updated signature to match implementation in useConversationManagement
-  startNewChat: (selectedMode?: MessageMode | null) => Promise<string | null>;
+  // Fix the function signature to match implementation
+  startNewChat: (mode?: MessageMode | null) => Promise<string | null>;
   checkSubscriptionStatus: () => Promise<void>;
   loadConversation: (id: string) => Promise<void>;
   generateInitialMessage: (conversationId: string) => Promise<void>;

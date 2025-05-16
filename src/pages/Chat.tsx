@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import ChatContainer from "@/components/chat/ChatContainer";
@@ -57,7 +56,7 @@ const Chat = () => {
     
     // If there's no conversation yet, start a new one with selected mode
     if (!conversationId) {
-      // Updated to use the correct function signature
+      // Updated to match the new function signature
       startNewChat(selectedMode);
     } else {
       // If we have an existing conversation, update its mode

@@ -84,7 +84,7 @@ export function useChatOperations() {
     conversationId,
     setMode,
     sendMessage,
-    // Fix the signature to match types.ts by using an adapter function
+    // Ensure startNewChat function has the same signature as in the types
     startNewChat: (selectedMode?: MessageMode | null) => startNewChat(false, selectedMode),
     checkSubscriptionStatus,
     loadConversation: loadConversationData,
