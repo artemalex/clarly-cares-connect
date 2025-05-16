@@ -162,14 +162,13 @@ serve(async (req) => {
     }
 
     // Format for the OpenAI API
-    const openaiMessages = messages.map((msg: Message) => ({
+    const openaiMessages = messages.map((msg) => ({
       role: msg.role,
       content: msg.content
     }));
 
     // Always determine the current mode
     const currentMode = mode || conversationData.mode;
-    
     console.log(`Using mode for system prompt: ${currentMode}`);
     
     if (!currentMode || (currentMode !== 'vent' && currentMode !== 'slow')) {
@@ -178,21 +177,19 @@ serve(async (req) => {
     
     // Get the appropriate system prompt
     const systemPrompt = currentMode === 'vent' 
-      ? SYSTEM_PROMPTS.vent
+      ? SYSTEM_PROMPTS.vent 
       : SYSTEM_PROMPTS.slow;
 
-    // Check if the first message is already a system prompt
-    const hasSystemPrompt = openaiMessages.length > 0 && openaiMessages[0].role === 'system';
-
-    // If there's no system prompt, add it
-    if (!hasSystemPrompt) {
+    // Always ensure the system prompt is the first message
+    if (openaiMessages.length > 0 && openaiMessages[0].role === 'system') {
+      // Update existing system prompt to ensure it matches current mode
+      openaiMessages[0].content = systemPrompt;
+    } else {
+      // Add system prompt at the beginning
       openaiMessages.unshift({
         role: "system",
         content: systemPrompt
       });
-    } else {
-      // If there is a system prompt, update it to ensure it matches the current mode
-      openaiMessages[0].content = systemPrompt;
     }
 
     // Call OpenAI API
@@ -203,7 +200,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${openaiApiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o", 
+        model: "gpt-4o",
         messages: openaiMessages,
         max_tokens: 1000,
         temperature: 0.7
